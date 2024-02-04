@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 import GUI from 'lil-gui';
 
@@ -6,6 +7,8 @@ import GUI from 'lil-gui';
 
 // Debug
 const gui = new GUI();
+
+const debugObject = {}
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl');
@@ -28,18 +31,72 @@ console.log('camera: ', camera)
 console.log('renderer: ', renderer)
 
 
+// Function to change the size of the cube
+function changeSizeOfCube() {
+    let sizeValue;
+    
+    // Set sizeValue based on the selected option
+    switch (debugObject.size) {
+      case 'Small':
+        sizeValue = 0.5;
+        break;
+      case 'Medium':
+        sizeValue = 1;
+        break;
+      case 'Large':
+        sizeValue = 1.5;
+        break;
+      default:
+        sizeValue = 1;
+    }
+  
+    // Update the scale of the cube
+    cube.scale.set(sizeValue, sizeValue, sizeValue);
+  }
 /* Test Cube */
-const geometry = new THREE.BoxGeometry(1, 1, 1)
-const material = new THREE.MeshBasicMaterial( {color: 'red' })
-const cube = new THREE.Mesh(geometry, material)
+// let colorBox = new THREE.Color(0xaa00ff)
+debugObject.color  = new THREE.Color('#e20303')
+debugObject.size = 'Medium'
+
+
+const geometryCube = new THREE.BoxGeometry(1, 1, 1)
+const materialCube = new THREE.MeshBasicMaterial( {color: debugObject.color })
+const cube = new THREE.Mesh(geometryCube, materialCube)
 scene.add(cube)
 camera.position.z = 5
 // camera.position.y = 5
 // camera.rotateX( - Math.PI / 4)
 
+gui.add(debugObject, 'size', [ 'Small', 'Medium', 'Large' ])
+.onChange(() => changeSizeOfCube())
+changeSizeOfCube();
 
-console.log('geometry: ', geometry)
-console.log('material: ', material)
+gui.addColor( debugObject, 'color' )
+.onChange(() => {
+    // colorBox = colorInput
+    materialCube.color.set(debugObject.color)
+    console.log('onChange - materialCube: ', debugObject.color)
+});
+
+gui.add(materialCube, 'wireframe');
+
+gui.add(cube.position, 'x')
+.min(-5).max(5).step(0.01).name('slide cube')
+
+gui.add(cube.position, 'y')
+.min(-5).max(5).step(0.01).name('elevate cube')
+
+gui.add(cube.position, 'z')
+.min(-5).max(5).step(0.01).name('focus cube')
+
+
+// gui.add(debugObject, 'size', [ 'Small', 'Medium', 'Large' ]);
+// gui.add(geometry, 'size', 0, 1);
+//  [ 'Small', 'Medium', 'Large' ] 
+
+
+console.log('geometryCube: ', geometryCube)
+console.log('materialCube: ', materialCube)
 console.log('cube: ', cube)
 
 
@@ -111,4 +168,5 @@ function animate(){
     cube.rotation.y += 0.01
 }
 
-animate()
+animate();
+
