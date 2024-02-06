@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
+import { RectAreaLightHelper } from 'three/addons/helpers/RectAreaLightHelper.js';
 
 import GUI from 'lil-gui';
 
@@ -13,57 +14,85 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+/* 
+    Lights
+*/
+// Entrance Light
+const entranceLight = new THREE.PointLight('#FFFFE0', 100, 250, 2);
+entranceLight.position.set( -2, 1, 10 );
+entranceLight.castShadow = true
+scene.add( entranceLight );
+const entranceLightHelper = new THREE.PointLightHelper(entranceLight)
+// scene.add(entranceLightHelper)
+
+const officeLight = new THREE.PointLight('#FFFFE0', 100, 250, 2);
+officeLight.position.set( -6, 3, 0 );
+officeLight.castShadow = true
+scene.add( officeLight );
+const officeLightHelper = new THREE.PointLightHelper(officeLight)
+// scene.add(officeLightHelper)
+
+const livingRoomWindowLight = new THREE.RectAreaLight('#FFFFE0', 10, 7, 4);
+livingRoomWindowLight.position.set( 1.9, 0, 10.2 );
+livingRoomWindowLight.castShadow = true
+scene.add( livingRoomWindowLight );
+const livingRoomWindowLightHelper = new RectAreaLightHelper(livingRoomWindowLight)
+// scene.add(livingRoomWindowLightHelper)
+
+
+
+
 // Define materials and geometries
-const wallMaterial1 = new THREE.MeshBasicMaterial({ color: 0x808080, side: THREE.DoubleSide });
-const wallMaterial2 = new THREE.MeshBasicMaterial({ color: 0x808080, side: THREE.DoubleSide });
-const wallMaterial3 = new THREE.MeshBasicMaterial({ color: 0x808080, side: THREE.DoubleSide });
-const wallMaterial4 = new THREE.MeshBasicMaterial({ color: 0x808080, side: THREE.DoubleSide });
-const floorMaterial = new THREE.MeshBasicMaterial({ color: '#C4A484', side: THREE.DoubleSide });
-const ceilingMaterial = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, wireframe: false, side: THREE.DoubleSide });
+const wallMaterial1 = new THREE.MeshPhongMaterial({ color: 0x808080, side: THREE.DoubleSide });
+const wallMaterial2 = new THREE.MeshPhongMaterial({ color: 0x808080, side: THREE.DoubleSide });
+const wallMaterial3 = new THREE.MeshPhongMaterial({ color: 0x808080, side: THREE.DoubleSide });
+const wallMaterial4 = new THREE.MeshPhongMaterial({ color: 0x808080, side: THREE.DoubleSide });
+const floorMaterial = new THREE.MeshPhongMaterial({ color: '#C4A484', side: THREE.DoubleSide });
+const ceilingMaterial = new THREE.MeshPhongMaterial({ transparent: true, opacity: 0, wireframe: false, side: THREE.DoubleSide });
 
 const roomMaterials = [ wallMaterial1, wallMaterial2, ceilingMaterial, floorMaterial, wallMaterial3, wallMaterial4 ]
-const doorMaterial = new THREE.MeshBasicMaterial({ color: 0x909090 });
-const entranceWayMaterial = new THREE.MeshBasicMaterial({ color: 'black', transparent: true, opacity: 0.1, });
-const windowMaterial = new THREE.MeshBasicMaterial({ color: 0xADD8E6, side: THREE.DoubleSide, transparent: true, opacity: 0.5 });
+const doorMaterial = new THREE.MeshPhongMaterial({ color: 0x909090 });
+const entranceWayMaterial = new THREE.MeshPhongMaterial({ color: 'black', transparent: true, opacity: 0.1, });
+const windowMaterial = new THREE.MeshPhongMaterial({ color: 0xADD8E6, side: THREE.DoubleSide, transparent: true, opacity: 0.5 });
 // const wallGeometry = new THREE.BoxGeometry(1, 1, 0.1);
 
 // Cabinets materials
-const woodMaterial = new THREE.MeshBasicMaterial({ color: 0x8B4513, side: THREE.DoubleSide });
-const openMaterial = new THREE.MeshBasicMaterial({ color: 'black', transparent: true, opacity: 0.5 });
+const woodMaterial = new THREE.MeshPhongMaterial({ color: 0x8B4513, side: THREE.DoubleSide });
+const openMaterial = new THREE.MeshPhongMaterial({ color: 'black', transparent: true, opacity: 0.5 });
 
 // Couch materials
-const couchMaterial = new THREE.MeshBasicMaterial({ color: '#1560bd' }); // Light blue color
-// const cushionMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff }); // White color for cushions
+const couchMaterial = new THREE.MeshPhongMaterial({ color: '#1560bd' }); // Light blue color
+// const cushionMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff }); // White color for cushions
 
 // Dog pen materials
-const penWallMaterial = new THREE.MeshBasicMaterial({ color: 'black', transparent: true, opacity: 0.5, side: THREE.DoubleSide });
-// const groundMaterial = new THREE.MeshBasicMaterial({ color: 0x228B22 });
-// const penMaterial = new THREE.MeshBasicMaterial({ color: 0xadd8e6 }); // Light blue color for the pen
+const penWallMaterial = new THREE.MeshPhongMaterial({ color: 'black', transparent: true, opacity: 0.5, side: THREE.DoubleSide });
+// const groundMaterial = new THREE.MeshPhongMaterial({ color: 0x228B22 });
+// const penMaterial = new THREE.MeshPhongMaterial({ color: 0xadd8e6 }); // Light blue color for the pen
 
 // Black and blue desk materials
-const blackMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
-const blueMaterial = new THREE.MeshBasicMaterial({ color: 0x0000FF });
+const blackMaterial = new THREE.MeshPhongMaterial({ color: 0x000000 });
+const blueMaterial = new THREE.MeshPhongMaterial({ color: 0x0000FF });
 
 // Book shelf materials
-const woodShelfMaterial = new THREE.MeshBasicMaterial({ color: 0x8B4513 });
-const bookMaterial = new THREE.MeshBasicMaterial({ color: 0x0000FF }); // Blue color for books
+const woodShelfMaterial = new THREE.MeshPhongMaterial({ color: 0x8B4513 });
+const bookMaterial = new THREE.MeshPhongMaterial({ color: 0x0000FF }); // Blue color for books
 
 // TV stand materials
-const woodTVStandMaterial = new THREE.MeshBasicMaterial({ color: 0x8B4513 });
-const metalMaterial = new THREE.MeshBasicMaterial({ color: 0x808080 });
-const glassMaterial = new THREE.MeshBasicMaterial({ color: 0xADD8E6, transparent: true, opacity: 0.5 });
+const woodTVStandMaterial = new THREE.MeshPhongMaterial({ color: 0x8B4513 });
+const metalMaterial = new THREE.MeshPhongMaterial({ color: 0x808080 });
+const glassMaterial = new THREE.MeshPhongMaterial({ color: 0xADD8E6, transparent: true, opacity: 0.5 });
 
 // TV materials
-const tvMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 }); // Black color for the TV
-const screenMaterial = new THREE.MeshBasicMaterial({ color: 0xADD8E6, transparent: true, opacity: 0.8 }); // Light blue color for the screen
-const standMaterial = new THREE.MeshBasicMaterial({ color: 0x8B4513 }); // Brown color for the stand
+const tvMaterial = new THREE.MeshPhongMaterial({ color: 0x000000 }); // Black color for the TV
+const screenMaterial = new THREE.MeshPhongMaterial({ color: 0xADD8E6, transparent: true, opacity: 0.8 }); // Light blue color for the screen
+const standMaterial = new THREE.MeshPhongMaterial({ color: 0x8B4513 }); // Brown color for the stand
 
 // Metal table materials
-const metalTableMaterial = new THREE.MeshBasicMaterial({ color: 0x808080 }); // Gray color for the metal
+const metalTableMaterial = new THREE.MeshPhongMaterial({ color: 0x808080 }); // Gray color for the metal
 
 // Office chair materials
-const blackLeatherMaterial = new THREE.MeshBasicMaterial({ color: 0x000000  });
-const blueLeatherMaterial = new THREE.MeshBasicMaterial({ color: 0x0000FF  });
+const blackLeatherMaterial = new THREE.MeshPhongMaterial({ color: 0x000000  });
+const blueLeatherMaterial = new THREE.MeshPhongMaterial({ color: 0x0000FF  });
 
 // Function to create a room
 function createRoom(width, height, depth, material) {
@@ -103,7 +132,7 @@ function createMetalTable() {
     const table = new THREE.Group();
   
     // Create the tabletop
-    const tabletopGeometry = new THREE.BoxGeometry(4, 0.2, 2);
+    const tabletopGeometry = new THREE.BoxGeometry(5, 0.2, 2);
     const tabletop = new THREE.Mesh(tabletopGeometry, metalTableMaterial);
     table.add(tabletop);
   
@@ -462,7 +491,7 @@ woodBlock.rotateY(Math.PI / 2)
 // Create the indoor dog pen
 const indoorDogPen = createIndoorDogPen();
 scene.add(indoorDogPen);
-indoorDogPen.position.set(6, -1, 2)
+indoorDogPen.position.set(5.9, -1, 2)
 
 // Create the black and blue desk
 const blackBlueDesk = createBlackBlueDesk();
