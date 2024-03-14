@@ -29,8 +29,8 @@ const objects = []
     Lights
 */
 // Entrance Light
-const entranceLight = new THREE.PointLight('#FFFFE0', 100, 250, 2);
-entranceLight.position.set( -2, 1, 10 );
+const entranceLight = new THREE.PointLight('#FFFFE0', 10, 25, 2);
+entranceLight.position.set( -2, 1.5, 9.8 );
 entranceLight.castShadow = true
 
 //Set up shadow properties for the light
@@ -50,7 +50,7 @@ scene.add( entranceLight );
 
 
 // Office Light
-const officeLight = new THREE.PointLight('#FFFFE0', 100, 250, 2);
+const officeLight = new THREE.PointLight('#FFFFE0', 10, 25, 2);
 officeLight.position.set( -6, 3, 0 );
 officeLight.castShadow = true
 
@@ -65,8 +65,24 @@ scene.add( officeLight );
 // scene.add( officeLightShadowHelper );
 
 
+// Bedroom Light
+const bedroomLight = new THREE.PointLight('#FFFFE0', 10, 25, 2);
+bedroomLight.position.set(2.5, 3, -10)
+bedroomLight.castShadow = true
+
+//Set up shadow properties for the light
+bedroomLight.shadow.mapSize.width = 512; // default
+bedroomLight.shadow.mapSize.height = 512; // default
+bedroomLight.shadow.camera.near = 0.5; // default
+bedroomLight.shadow.camera.far = 500; // default
+scene.add( bedroomLight );
+// // Create a helper for the shadow camera
+// const bedroomLightShadowHelper = new THREE.CameraHelper( bedroomLight.shadow.camera );
+// scene.add( bedroomLightShadowHelper );
+
+
 // Kitchen Light
-const kitchenLight = new THREE.PointLight('#FFFFE0', 100, 250, 2);
+const kitchenLight = new THREE.PointLight('#FFFFE0', 10, 25, 2);
 kitchenLight.position.set( 3, 3, -3 );
 kitchenLight.castShadow = true
 
@@ -79,6 +95,22 @@ scene.add( kitchenLight );
 // Create a helper for the shadow camera
 // const kitchenLightShadowHelper = new THREE.CameraHelper( kitchenLight.shadow.camera );
 // scene.add( kitchenLightShadowHelper );
+
+
+// Bathroom Light
+const bathroomLight = new THREE.PointLight('#FFFFE0', 10, 25, 2);
+bathroomLight.position.set(-7, 1.5, -7);
+bathroomLight.castShadow = true
+
+//Set up shadow properties for the light
+bathroomLight.shadow.mapSize.width = 512; // default
+bathroomLight.shadow.mapSize.height = 512; // default
+bathroomLight.shadow.camera.near = 0.5; // default
+bathroomLight.shadow.camera.far = 500; // default
+scene.add( bathroomLight );
+// Create a helper for the shadow camera
+// const bathroomLightShadowHelper = new THREE.CameraHelper( bathroomLight.shadow.camera );
+// scene.add( bathroomLightShadowHelper );
 
 
 // Living Room Window Light
@@ -167,20 +199,23 @@ const tvMaterial = new THREE.MeshPhongMaterial({ color: 0x000000 }); // Black co
 const screenMaterial = new THREE.MeshPhongMaterial({ color: 0xADD8E6, transparent: true, opacity: 0.8 }); // Light blue color for the screen
 const standMaterial = new THREE.MeshPhongMaterial({ color: 0x8B4513 }); // Brown color for the stand
 
-// Metal table materials
+// Metal table material
 const metalTableMaterial = new THREE.MeshPhongMaterial({ color: 0x808080 }); // Gray color for the metal
 
-// Office chair materials
+// Office chair material
 const blackLeatherMaterial = new THREE.MeshPhongMaterial({ color: 0x000000  });
 const blueLeatherMaterial = new THREE.MeshPhongMaterial({ color: 0x0000FF  });
 
-// Bed materials
+// Bed material
 const bedMaterial = new THREE.MeshPhongMaterial({ color: 0x0000FF }); // Blue color for bed
 
-// Paintings
+// Painting material
 const paintingMaterialsRed = new THREE.MeshPhongMaterial({ color: '#65000B'  })
 const paintingMaterialsGreen = new THREE.MeshPhongMaterial({ color: '#043927'  })
 const paintingMaterialsBlue = new THREE.MeshPhongMaterial({ color: '#041E42'  })
+
+// Bathtub material
+const bathtubMaterial = new THREE.MeshPhongMaterial({ color: 0xFFFFFF }); // White color for the bathtub
 
 // Function to create a wall
 function createWall(width, height, depth, material) {
@@ -711,19 +746,23 @@ function createBed() {
     return bed;
 }
 
+// Function to create a simple bathtub
+function createBathtub() {  
+    // Create the bathtub body
+    const bathtubGeometry = new THREE.BoxGeometry(2.9, 2, 2);
+    const bathtub = new THREE.Mesh(bathtubGeometry, bathtubMaterial);
+    
+    return bathtub;
+}
+
 
 // Create living room with office space
 const livingRoom = createRoom(15, 5, 15, roomMaterials);
 livingRoom.position.set(0, 0, 2.5);
 
 // Create kitchen
-// const kitchen = createRoom(10, 5, 5, roomMaterials);
 const kitchenCounter = createKitchen(8.5, 2, 1.5, woodMaterial);
 kitchenCounter.position.set(3.24, -1.5, -1);
-
-
-
-
 
 // Create kitchen stove counter
 const kitchenStoveCounter = createKitchen(6.5, 2, 1.5, woodMaterial);
@@ -734,7 +773,6 @@ const kitchenFridge = createKitchen(1.5, 4, 1.5, fridgeMaterial);
 kitchenFridge.position.set(6.74, -0.5, -4);
 
 // Create kitchen pantry
-// const kitchenPantry = createKitchen(1.5, 5, 1.5, woodMaterial);
 const kitchenPantry = createRoom(2.5, 5, 1.5, roomMaterials);
 kitchenPantry.position.set(-1.75, 0, -4);
 
@@ -749,10 +787,6 @@ kitchenPillar.position.set(-1.45, 0, -1);
 // Create kitchen pillar wall
 const kitchenPillarWall = createWall(2.1, 5, 0.01, roomMaterials);
 kitchenPillarWall.position.set(-1.5, 0, -.2);
-
-
-
-
 
 // Create storage closet
 const storageCloset = createRoom(3, 5, 3, roomMaterials);
@@ -880,17 +914,16 @@ objects.push( officeJesterPainting );
 // Create the entrance paintings
 const entranceSamuraiPainting = createLargePainting(paintingMaterialsGreen);
 scene.add(entranceSamuraiPainting);
-entranceSamuraiPainting.position.set(-3, 1, 9.9)
+entranceSamuraiPainting.position.set(-3.5, .7, 9.9)
 objects.push( entranceSamuraiPainting );
 
 // Create the living room paintings
 const livingRoomSamuraiPainting = createLargePainting(paintingMaterialsBlue);
 scene.add(livingRoomSamuraiPainting);
-livingRoomSamuraiPainting.position.set(7, 1.2, 4.5)
+livingRoomSamuraiPainting.position.set(7, 1.2, 4.1)
 livingRoomSamuraiPainting.rotateY(Math.PI / 2)
 // livingRoomSamuraiPainting.rotateZ(Math.PI / 2)
 objects.push( livingRoomSamuraiPainting );
-
 
 // Create the bed
 const bed = createBed(bedMaterial);
@@ -899,6 +932,11 @@ bed.position.set(5.5, -1.5, -12)
 bed.rotateY(Math.PI / 2)
 // livingRoomSamuraiPainting.rotateZ(Math.PI / 2)
 objects.push( bed );
+
+// Create the bathtub
+const bathtub = createBathtub();
+scene.add(bathtub);
+bathtub.position.set(-6, -1, -10.9);
 
 
 /**
@@ -953,112 +991,81 @@ camera.lookAt(0, 0, 0);
 const orbitControls = new OrbitControls(camera, canvas);
 
 
+/* UNCOMMENT BELOW TO ENABLE DRAG CONTROLS */
+// const dragControls = new DragControls( [...objects], camera, canvas );
+// dragControls.recursive = true
 
-const dragControls = new DragControls( [...objects], camera, canvas );
-dragControls.recursive = true
+// const enableSelection = false
+// window.addEventListener( 'keydown', onKeyDown );
+// window.addEventListener( 'keyup', onKeyUp );
+// function onKeyDown( event ) {
 
-const enableSelection = false
-window.addEventListener( 'keydown', onKeyDown );
-window.addEventListener( 'keyup', onKeyUp );
-function onKeyDown( event ) {
+//     enableSelection = ( event.keyCode === 16 ) ? true : false;
 
-    enableSelection = ( event.keyCode === 16 ) ? true : false;
-
-}
-
-function onKeyUp() {
-
-    enableSelection = false;
-
-}
-
-let groupToDrag = new THREE.Group();
-scene.add( groupToDrag );
-
-const mouse = new THREE.Vector2()
-dragControls.addEventListener( 'drag', tick );
-document.addEventListener( 'click', onClick );
-function onClick( event ) {
-
-
-    event.preventDefault();
-
-    // if ( enableSelection === true ) {
-
-        const draggableObjects = dragControls.getObjects();
-        draggableObjects.length = 0;
-        console.log('draggableObjects: ', draggableObjects)
-
-        mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-        mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-        // raycaster.setFromCamera( mouse, camera );
-
-        // const intersections = raycaster.intersectObjects( objects, true );
-        const intersections = 0;
-console.log(1)
-if ( intersections.length > 0 ) {
-    
-    const object = intersections[ 0 ].object;
-    
-    console.log(2)
-    if ( groupToDrag.children.includes( object ) === true ) {
-        
-        console.log(31)
-        object.material.emissive.set( 0x000000 );
-        scene.attach( object );
-        
-    } else {
-                console.log(32)
-                
-                object.material.emissive.set( 0xaaaaaa );
-                groupToDrag.attach( object );
-                
-            }
-            
-            console.log(4)
-            dragControls.transformGroup = true;
-            draggableObjects.push( groupToDrag );
-            
-        }
-        
-        if ( groupToDrag.children.length === 0 ) {
-            
-            console.log(5)
-            dragControls.transformGroup = false;
-            draggableObjects.push( ...objects );
-
-        }
-
-    // }
-
-    tick();
-
-}
-// // add event listener to highlight dragged objects
-
-// dragControls.addEventListener( 'dragstart', function ( event ) {
-
-// 	event.object.material.emissive.set( 0xaaaaaa );
-
-// } );
-
-// dragControls.addEventListener( 'dragend', function ( event ) {
-
-// 	event.object.material.emissive.set( 0x000000 );
-//     scene.attach( object );
-
-// } );
-
-
-// // Render loop
-// function animate() {
-//   requestAnimationFrame(animate);
-//   renderer.render(scene, camera);
-//   controls.update();
 // }
 
-// animate();
+// function onKeyUp() {
+
+//     enableSelection = false;
+
+// }
+
+// let groupToDrag = new THREE.Group();
+// scene.add( groupToDrag );
+
+// const mouse = new THREE.Vector2()
+// dragControls.addEventListener( 'drag', tick );
+// document.addEventListener( 'click', onClick );
+// function onClick( event ) {
+
+//   event.preventDefault();
+
+//   // if ( enableSelection === true ) {
+
+//       const draggableObjects = dragControls.getObjects();
+//       draggableObjects.length = 0;
+//       console.log('draggableObjects: ', draggableObjects)
+
+//       mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+//       mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+//       // raycaster.setFromCamera( mouse, camera );
+
+//       // const intersections = raycaster.intersectObjects( objects, true );
+//         const intersections = 0;
+//   if ( intersections.length > 0 ) {
+    
+//     const object = intersections[ 0 ].object;
+    
+//     if ( groupToDrag.children.includes( object ) === true ) {
+        
+//         object.material.emissive.set( 0x000000 );
+//         scene.attach( object );
+        
+//     } else {
+                
+//         object.material.emissive.set( 0xaaaaaa );
+//         groupToDrag.attach( object );
+        
+//     }
+            
+//     dragControls.transformGroup = true;
+//     draggableObjects.push( groupToDrag );
+            
+//   }
+        
+//   if ( groupToDrag.children.length === 0 ) {
+      
+//       dragControls.transformGroup = false;
+//       draggableObjects.push( ...objects );
+
+//   }
+
+//     // }
+
+//     tick();
+
+// }
 
 /**
  * Animate
