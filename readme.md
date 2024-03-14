@@ -1,5 +1,7 @@
 # Three.js Journey
 
+Prod url: https://apartment-configurator-9aahic0u3-dev94s-projects-9a098fa3.vercel.app/
+
 ## Setup
 
 Download [Node.js](https://nodejs.org/en/download/).
