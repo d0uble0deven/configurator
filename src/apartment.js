@@ -23,7 +23,7 @@ renderer.shadowMap.type = THREE.BasicShadowMap; // default THREE.PCFShadowMap
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
-const objects = []
+const draggableObjects = []
 
 /* 
     Lights
@@ -835,87 +835,87 @@ const couch = createCouch();
 scene.add(couch);
 couch.position.set(0, -1, 6.5)
 couch.rotateY(Math.PI / 2)
-objects.push( couch );
+draggableObjects.push( couch );
   
 // Create the wood block with cubby holes
 const woodBlock = createWoodBlock();
 scene.add(woodBlock);
 woodBlock.position.set(-7.9, -1, 6)
 woodBlock.rotateY(Math.PI / 2)
-objects.push( woodBlock );
+draggableObjects.push( woodBlock );
 
 // Create the indoor dog pen
 const indoorDogPen = createIndoorDogPen();
 scene.add(indoorDogPen);
 indoorDogPen.position.set(5.9, -1, 1.5)
-objects.push( indoorDogPen );
+draggableObjects.push( indoorDogPen );
 
 // Create the black and blue desk
 const blackBlueDesk = createBlackBlueDesk();
 scene.add(blackBlueDesk);
 blackBlueDesk.position.set(-5.5, -1, 1)
-objects.push( blackBlueDesk );
+draggableObjects.push( blackBlueDesk );
 
 // Create the bookshelf
 const bookshelf = createBookshelf();
 scene.add(bookshelf);
 bookshelf.position.set(2, -2, .3)
-objects.push( bookshelf );
+draggableObjects.push( bookshelf );
 
 // Create the TV stand
 const tvStand = createTVStand();
 scene.add(tvStand);
 tvStand.position.set(5, -1, 7)
 tvStand.rotateY(Math.PI / 3)
-objects.push( tvStand );
+draggableObjects.push( tvStand );
 
 // Create the flat-screen TV
 const flatScreenTV = createFlatScreenTV();
 scene.add(flatScreenTV);
 flatScreenTV.position.set(5, 1.3, 7.1)
 flatScreenTV.rotateY( (- Math.PI - 3.5) / 3 )
-objects.push( flatScreenTV );
+draggableObjects.push( flatScreenTV );
 
 // Create the metal table
 const metalTable = createMetalTable();
 scene.add(metalTable);
 metalTable.position.set(-2, -1, 6.5)
 metalTable.rotateY(Math.PI / 2)
-objects.push( metalTable );
+draggableObjects.push( metalTable );
 
 // Create the office stand
 const officeStand = createOfficeStand();
 scene.add(officeStand);
 officeStand.position.set(-6, -1, -2)
-objects.push( officeStand );
+draggableObjects.push( officeStand );
 
 // Create the leather chair
 const leatherChair = createLeatherChair();
 scene.add(leatherChair);
 leatherChair.position.set(-5.5, -1.7, 0)
-objects.push( leatherChair );
+draggableObjects.push( leatherChair );
 
 // Create the office paintings
 const officeSamuraiPainting = createLargePainting(paintingMaterialsRed);
 scene.add(officeSamuraiPainting);
 officeSamuraiPainting.position.set(-5.5, 1, -2.4)
-objects.push( officeSamuraiPainting );
+draggableObjects.push( officeSamuraiPainting );
 
 const officeRoshaschPainting = createSmallPainting(paintingMaterialsBlue);
 scene.add(officeRoshaschPainting);
 officeRoshaschPainting.position.set(-6.75, 1.5, -2.4)
-objects.push( officeRoshaschPainting );
+draggableObjects.push( officeRoshaschPainting );
 
 const officeJesterPainting = createSmallPainting(paintingMaterialsGreen);
 scene.add(officeJesterPainting);
 officeJesterPainting.position.set(-6.75, 0.5, -2.4)
-objects.push( officeJesterPainting );
+draggableObjects.push( officeJesterPainting );
 
 // Create the entrance paintings
 const entranceSamuraiPainting = createLargePainting(paintingMaterialsGreen);
 scene.add(entranceSamuraiPainting);
 entranceSamuraiPainting.position.set(-3.5, .7, 9.9)
-objects.push( entranceSamuraiPainting );
+draggableObjects.push( entranceSamuraiPainting );
 
 // Create the living room paintings
 const livingRoomSamuraiPainting = createLargePainting(paintingMaterialsBlue);
@@ -923,7 +923,7 @@ scene.add(livingRoomSamuraiPainting);
 livingRoomSamuraiPainting.position.set(7, 1.2, 4.1)
 livingRoomSamuraiPainting.rotateY(Math.PI / 2)
 // livingRoomSamuraiPainting.rotateZ(Math.PI / 2)
-objects.push( livingRoomSamuraiPainting );
+draggableObjects.push( livingRoomSamuraiPainting );
 
 // Create the bed
 const bed = createBed(bedMaterial);
@@ -931,7 +931,7 @@ scene.add(bed);
 bed.position.set(5.5, -1.5, -12)
 bed.rotateY(Math.PI / 2)
 // livingRoomSamuraiPainting.rotateZ(Math.PI / 2)
-objects.push( bed );
+draggableObjects.push( bed );
 
 // Create the bathtub
 const bathtub = createBathtub();
@@ -992,80 +992,36 @@ const orbitControls = new OrbitControls(camera, canvas);
 
 
 /* UNCOMMENT BELOW TO ENABLE DRAG CONTROLS */
-// const dragControls = new DragControls( [...objects], camera, canvas );
-// dragControls.recursive = true
+const dragControls = new DragControls( [...draggableObjects], camera, canvas );
 
-// const enableSelection = false
-// window.addEventListener( 'keydown', onKeyDown );
-// window.addEventListener( 'keyup', onKeyUp );
-// function onKeyDown( event ) {
+let originalColorOfDraggedObject
+dragControls.addEventListener('dragstart', function ( event ) {
+  originalColorOfDraggedObject = event.object.material.color
 
-//     enableSelection = ( event.keyCode === 16 ) ? true : false;
+  event.object.castShadow = true;
 
-// }
+  // make sure objects stay on the ground
+  event.object.position.set(event.object.position.x, 1,event.object.position.z)
+} );
 
-// function onKeyUp() {
-
-//     enableSelection = false;
-
-// }
-
-// let groupToDrag = new THREE.Group();
-// scene.add( groupToDrag );
-
-// const mouse = new THREE.Vector2()
-// dragControls.addEventListener( 'drag', tick );
-// document.addEventListener( 'click', onClick );
-// function onClick( event ) {
-
-//   event.preventDefault();
-
-//   // if ( enableSelection === true ) {
-
-//       const draggableObjects = dragControls.getObjects();
-//       draggableObjects.length = 0;
-//       console.log('draggableObjects: ', draggableObjects)
-
-//       mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-//       mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-//       // raycaster.setFromCamera( mouse, camera );
-
-//       // const intersections = raycaster.intersectObjects( objects, true );
-//         const intersections = 0;
-//   if ( intersections.length > 0 ) {
+dragControls.addEventListener('drag', function ( event ) {
+  
+  event.object.castShadow = true;
+  event.object.material.emissive.set( 0xaaaaaa );
+  
+  // make sure objects stay on the ground
+	event.object.position.set(event.object.position.x, 1,event.object.position.z)
     
-//     const object = intersections[ 0 ].object;
-    
-//     if ( groupToDrag.children.includes( object ) === true ) {
-        
-//         object.material.emissive.set( 0x000000 );
-//         scene.attach( object );
-        
-//     } else {
-                
-//         object.material.emissive.set( 0xaaaaaa );
-//         groupToDrag.attach( object );
-        
-//     }
-            
-//     dragControls.transformGroup = true;
-//     draggableObjects.push( groupToDrag );
-            
-//   }
-        
-//   if ( groupToDrag.children.length === 0 ) {
-      
-//       dragControls.transformGroup = false;
-//       draggableObjects.push( ...objects );
+} );
 
-//   }
+dragControls.addEventListener('dragend', function ( event ) {
 
-//     // }
+  event.object.material.emissive.set( originalColorOfDraggedObject );
+  event.object.castShadow = false;
 
-//     tick();
+} );
 
-// }
+
 
 /**
  * Animate
@@ -1073,7 +1029,7 @@ const orbitControls = new OrbitControls(camera, canvas);
 const clock = new THREE.Clock()
 let previousTime = 0
 
-function tick() {
+function animate() {
     const elapsedTime = clock.getElapsedTime()
     const deltaTime = elapsedTime - previousTime
     previousTime = elapsedTime
@@ -1087,8 +1043,15 @@ function tick() {
     // Render
     renderer.render(scene, camera)
 
-    // Call tick again on the next frame
-    window.requestAnimationFrame(tick)
+  //   // Limit Drag Controls
+  //   if (isDragging) {
+  //     // Limit the movement along the y-axis
+  //     draggableObjects.position.y = Math.max(draggableObjects.position.y, -5); // Minimum y position
+  //     draggableObjects.position.y = Math.min(draggableObjects.position.y, 5);  // Maximum y position
+  // }
+
+    // Call animate again on the next frame
+    window.requestAnimationFrame(animate)
 }
 
-tick()
+animate()
