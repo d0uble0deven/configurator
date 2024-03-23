@@ -994,9 +994,14 @@ const orbitControls = new OrbitControls(camera, canvas);
 /* UNCOMMENT BELOW TO ENABLE DRAG CONTROLS */
 const dragControls = new DragControls( [...draggableObjects], camera, canvas );
 
+let draggedObject = undefined
 let originalColorOfDraggedObject
+
 dragControls.addEventListener('dragstart', function ( event ) {
   originalColorOfDraggedObject = event.object.material.color
+
+  draggedObject = event.object
+
 
   event.object.castShadow = true;
 
@@ -1011,13 +1016,17 @@ dragControls.addEventListener('drag', function ( event ) {
   
   // make sure objects stay on the ground
 	event.object.position.set(event.object.position.x, 1,event.object.position.z)
-    
+
 } );
 
 dragControls.addEventListener('dragend', function ( event ) {
 
+
+
   event.object.material.emissive.set( originalColorOfDraggedObject );
   event.object.castShadow = false;
+
+  draggedObject = undefined
 
 } );
 
@@ -1042,13 +1051,6 @@ function animate() {
 
     // Render
     renderer.render(scene, camera)
-
-  //   // Limit Drag Controls
-  //   if (isDragging) {
-  //     // Limit the movement along the y-axis
-  //     draggableObjects.position.y = Math.max(draggableObjects.position.y, -5); // Minimum y position
-  //     draggableObjects.position.y = Math.min(draggableObjects.position.y, 5);  // Maximum y position
-  // }
 
     // Call animate again on the next frame
     window.requestAnimationFrame(animate)
