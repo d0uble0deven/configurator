@@ -8,6 +8,7 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
 import { DragControls } from 'three/addons/controls/DragControls'
 
 import GUI from 'lil-gui';
+import CANNON from 'cannon'
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -217,21 +218,190 @@ const paintingMaterialsBlue = new THREE.MeshPhongMaterial({ color: '#041E42'  })
 // Bathtub material
 const bathtubMaterial = new THREE.MeshPhongMaterial({ color: 0xFFFFFF }); // White color for the bathtub
 
+
+
+
+
+/**
+ * Physics
+ */
+const world = new CANNON.World()
+world.gravity.set(0, - 9.82, 0)
+
+const defaultMaterial = new CANNON.Material('default')
+const defaultContactMaterial = new CANNON.ContactMaterial(
+    defaultMaterial,
+    defaultMaterial,
+    {
+        friction: 10,
+        restitution: 70
+        // friction: 0.1,
+        // restitution: 0.7
+    }
+)
+world.addContactMaterial(defaultContactMaterial)
+
+/**
+ * Sounds
+ */
+const hitSound = new Audio('/sounds/hit.mp3')
+
+const playHitSound = (collision) => {
+
+  console.log('collision: ', collision)
+alert('COLLIDE')
+  const impactStrength = collision.contact.getImpactVelocityAlongNormal()
+
+  if(impactStrength > 1.5) {
+      hitSound.volume = Math.random()
+      hitSound.currentTime = 0
+      hitSound.play()
+  }
+}
+
+
+// const sphere = new THREE.Mesh(
+//   new THREE.SphereGeometry(5, 32, 32),
+//   new THREE.MeshStandardMaterial({
+//       metalness: 0.3,
+//       roughness: 0.4,
+//       // envMap: environmentMapTexture,
+//       envMapIntensity: 0.5
+//   })
+// )
+// sphere.castShadow = true
+// sphere.position.y = 10
+// scene.add(sphere)
+
+// const sphereShape = new CANNON.Sphere(0.5)
+// const sphereBody = new CANNON.Body({
+//   mass: 1,
+//   position: new CANNON.Vec3(0, 10, 0),
+//   material: defaultMaterial,
+//   shape: sphereShape
+// })
+// world.addBody(sphereBody)
+
+
+const objectsToUpdate = []
+const createSphere = (radius, position) => {
+    // Three.js mesh
+    const mesh = new THREE.Mesh(
+        new THREE.SphereGeometry(radius, 20, 20),
+        new THREE.MeshStandardMaterial({
+            metalness: 0.3,
+            roughness: 0.4,
+            // envMap: environmentMapTexture,
+            envMapIntensity: 0.5
+        })
+    )
+    mesh.castShadow = true
+    mesh.position.copy(position)
+    scene.add(mesh)
+        // Cannon.js body
+        const shape = new CANNON.Sphere(radius)
+
+        const body = new CANNON.Body({
+            mass: 1,
+            position: new CANNON.Vec3(0, 10, 0),
+            shape: shape,
+            material: defaultMaterial
+        })
+        body.position.copy(position)
+        world.addBody(body)
+
+    // Add sound
+    body.addEventListener('collide', playHitSound)
+
+            // Save in objects to update
+    objectsToUpdate.push({
+      mesh: mesh,
+      body: body
+  })
+}
+// createSphere(1, { x: -2, y: 10, z: 6.5 }) // metal table
+// createSphere(1, { x: 0, y: 10, z: 6.5 }) // couch
+// createSphere(3, { x: 5.9, y: 10, z: 1.5 }) // dog pen
+// createSphere(3, { x: 5.5, y: 10, z: -12 }) // bed
+// createSphere(1, { x: -5.5, y: 10, z: 1 }) // blackBlueDesk -5.5, -1, 1
+
+
+/*
+  bodyFollowMesh(body, mesh) {
+    body.position.copy(mesh.position)
+  }
+*/
+
+const floorShape = new CANNON.Plane()
+const floorBody = new CANNON.Body()
+floorBody.material = defaultMaterial
+floorBody.mass = 0
+floorBody.position = new CANNON.Vec3(0, -3, 0),
+floorBody.addShape(floorShape)
+world.addBody(floorBody)
+
+floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(- 1, 0, 0), Math.PI * 0.5)
+
+
+
 // Function to create a wall
-function createWall(width, height, depth, material) {
+function createWall(width, height, depth, material, x, y, z) {
   const wall = new THREE.Mesh(new THREE.BoxGeometry(width, height, depth), material);
   scene.add(wall); 
+
+  wall.name = 'wall'
+
   wall.receiveShadow = true
+
+              // Cannon.js body
+              const shape = new CANNON.Box(new CANNON.Vec3(width, height, depth))
+              const body = new CANNON.Body({
+                  mass: 0,
+                  position: new CANNON.Vec3(x, y, z),
+                  // rotateY: Math.PI/2,
+                  shape: shape,
+                  material: defaultMaterial
+              })
+              world.addBody(body)
+      
+          // Add sound
+          body.addEventListener('collide', playHitSound)
+      
+                  // Save in objects to update
+          objectsToUpdate.push({
+            mesh: wall,
+            body: body
+        })
 
   return wall;
 }
 
 // Function to create a room
-function createRoom(width, height, depth, material) {
+function createRoom(width, height, depth, material, x, y, z) {
   const room = new THREE.Mesh(new THREE.BoxGeometry(width, height, depth), material);
   scene.add(room); 
   room.receiveShadow = true
 //   room.castShadow = true
+
+            // Cannon.js body
+            const shape = new CANNON.Box(new CANNON.Vec3(width, height, depth))
+            const body = new CANNON.Body({
+                mass: 0,
+                position: new CANNON.Vec3(x, y, z),
+                // rotateY: Math.PI/2,
+                shape: shape,
+                material: defaultMaterial
+            })
+            world.addBody(body)
+    
+        // Add sound
+        body.addEventListener('collide', playHitSound)
+    
+                // Save in objects to update
+        objectsToUpdate.push({
+          mesh: room,
+          body: body
+      })
 
   return room;
 }
@@ -311,8 +481,31 @@ function createCouch() {
     const couchBody = new THREE.Mesh(couchGeometry, couchMaterial);
     couch.add(couchBody);
 
+    couch.name = 'couch'
+
     couch.receiveShadow = true
     couch.castShadow = true
+
+            // Cannon.js body
+            const shape = new CANNON.Box(new CANNON.Vec3(1, 1, 1))
+            const body = new CANNON.Body({
+                mass: 0,
+                position: new CANNON.Vec3(0, -1, 6.5),
+                rotateY: Math.PI/2,
+                shape: shape,
+                material: defaultMaterial
+            })
+            world.addBody(body)
+    
+        // Add sound
+        body.addEventListener('collide', playHitSound)
+    
+                // Save in objects to update
+        objectsToUpdate.push({
+          mesh: couch,
+          body: body
+      })
+
     
   
     return couch;
@@ -344,6 +537,25 @@ function createMetalTable() {
     table.receiveShadow = true
     table.castShadow = true
 
+                // Cannon.js body
+                const shape = new CANNON.Box(new CANNON.Vec3(0, 0, 0))
+                const body = new CANNON.Body({
+                    mass: 0,
+                    position: new CANNON.Vec3(-2, -1, 6.5),
+                    shape: shape,
+                    rotateY: Math.PI/2,
+                    material: defaultMaterial
+                })
+                world.addBody(body)
+        
+            // Add sound
+            body.addEventListener('collide', playHitSound)
+        
+                    // Save in objects to update
+            objectsToUpdate.push({
+              mesh: table,
+              body: body
+          })
   
     return table;
   }
@@ -573,6 +785,27 @@ function createIndoorDogPen() {
     indoorDogPen.receiveShadow = true
     indoorDogPen.castShadow = true
 
+
+                // Cannon.js body
+                const shape = new CANNON.Box(new CANNON.Vec3(1, 1, 1))
+                const body = new CANNON.Body({
+                    mass: 0,
+                    position: new CANNON.Vec3(5.9, -1, 1.5),
+                    shape: shape,
+                    material: defaultMaterial
+                })
+                world.addBody(body)
+        
+            // Add sound
+            body.addEventListener('collide', playHitSound)
+        
+                    // Save in objects to update
+            objectsToUpdate.push({
+              mesh: indoorDogPen,
+              body: body
+          })
+    
+
   
     return indoorDogPen;
 }
@@ -647,6 +880,25 @@ function createBlackBlueDesk() {
   
     desk.receiveShadow = true
     desk.castShadow = true
+
+                    // Cannon.js body
+                    const shape = new CANNON.Box(new CANNON.Vec3(1, .1, 1))
+                    const body = new CANNON.Body({
+                        mass: 0,
+                        position: new CANNON.Vec3(-5.5, -1, 1),
+                        shape: shape,
+                        material: defaultMaterial
+                    })
+                    world.addBody(body)
+            
+                // Add sound
+                body.addEventListener('collide', playHitSound)
+            
+                        // Save in objects to update
+                objectsToUpdate.push({
+                  mesh: desk,
+                  body: body
+              })
 
     return desk;
 }
@@ -735,7 +987,7 @@ function createSmallPainting(color) {
 function createBed() {
     const bed = new THREE.Group();
   
-    // Create the main body of the couch
+    // Create the main body of the bed
     const bedGeometry = new THREE.BoxGeometry(6, 2, 4);
     const bedBody = new THREE.Mesh(bedGeometry, bedMaterial);
     bed.add(bedBody);
@@ -743,6 +995,31 @@ function createBed() {
     bed.receiveShadow = true
     bed.castShadow = true
     
+            // Cannon.js body
+            const shape = new CANNON.Box(new CANNON.Vec3(1, 1, 1))
+            const body = new CANNON.Body({
+                mass: 0,
+                position: new CANNON.Vec3(5.5, -1.5, -12),
+                rotateY: Math.PI/2,
+                shape: shape,
+                material: defaultMaterial
+            })
+            world.addBody(body)
+    
+        // Add sound
+        body.addEventListener('collide', playHitSound)
+    
+                // Save in objects to update
+        objectsToUpdate.push({
+          mesh: bed,
+          body: body
+      })
+
+
+    // bed.position.set(5.5, -1.5, -12)
+    // bed.rotateY(Math.PI / 2)
+
+
     return bed;
 }
 
@@ -757,7 +1034,7 @@ function createBathtub() {
 
 
 // Create living room with office space
-const livingRoom = createRoom(15, 5, 15, roomMaterials);
+const livingRoom = createRoom(15, 5, 15, roomMaterials, 0, 0, 2.5);
 livingRoom.position.set(0, 0, 2.5);
 
 // Create kitchen
@@ -773,11 +1050,12 @@ const kitchenFridge = createKitchen(1.5, 4, 1.5, fridgeMaterial);
 kitchenFridge.position.set(6.74, -0.5, -4);
 
 // Create kitchen pantry
-const kitchenPantry = createRoom(2.5, 5, 1.5, roomMaterials);
+const kitchenPantry = createRoom(2.5, 5, 1.5, roomMaterials, -1.75, 0, -4);
 kitchenPantry.position.set(-1.75, 0, -4);
 
 // Create kitchen bottom wall
-const kitchenBottomWall = createWall(9.5, 2, 0.01, roomMaterials);
+const kitchenBottomWall = createWall(9.5, 20, 0.01, roomMaterials, 0, 0, 0);
+// const kitchenBottomWall = createWall(9.5, 2, 0.01, roomMaterials, 2.5, -1.5, -.2);
 kitchenBottomWall.position.set(2.5, -1.5, -.2);
 
 // Create kitchen pillar
@@ -785,19 +1063,19 @@ const kitchenPillar = createKitchen(2, 5, 1.5, woodMaterial);
 kitchenPillar.position.set(-1.45, 0, -1);
 
 // Create kitchen pillar wall
-const kitchenPillarWall = createWall(2.1, 5, 0.01, roomMaterials);
+const kitchenPillarWall = createWall(2.1, 5, 0.01, roomMaterials, -1.5, 0, -.2);
 kitchenPillarWall.position.set(-1.5, 0, -.2);
 
 // Create storage closet
-const storageCloset = createRoom(3, 5, 3, roomMaterials);
+const storageCloset = createRoom(3, 5, 3, roomMaterials, -6, 0, -13.5);
 storageCloset.position.set(-6, 0, -13.5);
 
 // Create bathroom
-const bathroom = createRoom(3, 5, 9.5, roomMaterials);
+const bathroom = createRoom(3, 5, 9.5, roomMaterials, -6, 0, -7.25);
 bathroom.position.set(-6, 0, -7.25);
 
 // Create bedroom
-const bedroom = createRoom(12, 5, 10, roomMaterials);
+const bedroom = createRoom(12, 5, 10, roomMaterials, 1.5, 0, -10);
 bedroom.position.set(1.5, 0, -10);
 
 // Create doors
@@ -1015,9 +1293,44 @@ dragControls.addEventListener('drag', function ( event ) {
   event.object.material.emissive.set( 0xaaaaaa );
   
   // make sure objects stay on the ground
-	event.object.position.set(event.object.position.x, 1,event.object.position.z)
+	event.object.position.set(event.object.position.x, 1 ,event.object.position.z)
+	// event.object.position.set(event.object.position.x, 1 ,event.object.position.z)
+  if (event.object.position.y > 1) {
+    event.object.position.y = 1
+  }
 
+  orbitControls.enabled = false
+  bodyFollowMesh()
+  
+  
 } );
+
+const bodyFollowMesh = () => {
+  // const bodyFollowMesh = (body, mesh) => {
+    console.log('addEventListener - objectsToUpdate: ', objectsToUpdate)
+    console.log('addEventListener - objectsToUpdate[7]: ', objectsToUpdate[7])
+    
+    // if(objectsToUpdate[7].body.position.x == objectsToUpdate[2].body.position.x || objectsToUpdate[7].body.position.z == objectsToUpdate[2].body.position.z) {
+    if( objectsToUpdate[7].body.position.x == objectsToUpdate[2].body.position.x) {
+    // if( objectsToUpdate[7].body.position.z == objectsToUpdate[2].body.position.z) {
+      // playHitSound()
+      objectsToUpdate[7].body.addEventListener('collide', playHitSound)
+
+    }
+    // objectsToUpdate[7].body.addEventListener('collide', playHitSound)
+    objectsToUpdate[7].mesh.position.copy(objectsToUpdate[7].body.position)
+
+
+  //   for (const object of objectsToUpdate) {
+  //     object.mesh.position.copy(object.body.position)
+  //     // console.log('object.mesh.position: ', object.mesh.position)
+  //     // console.log('object.body.position: ', object.body.position)
+  //     object.body.addEventListener('collide', playHitSound)
+  //     // console.log('addEventListener - object.body: ', object.body)
+  //   }
+  // // body.position.copy(mesh.position)
+
+}
 
 dragControls.addEventListener('dragend', function ( event ) {
 
@@ -1027,6 +1340,9 @@ dragControls.addEventListener('dragend', function ( event ) {
   event.object.castShadow = false;
 
   draggedObject = undefined
+
+  orbitControls.enabled = true
+
 
 } );
 
@@ -1048,6 +1364,13 @@ function animate() {
 
     // Update controls
     orbitControls.update()
+
+        // Update physics
+        world.step(1 / 60, deltaTime, 3)
+        // for (const object of objectsToUpdate) {
+          // console.log('objectsToUpdate: ', objectsToUpdate)
+          // object.mesh.position.copy(object.body.position)
+        // }
 
     // Render
     renderer.render(scene, camera)
