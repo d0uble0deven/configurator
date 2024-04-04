@@ -8,6 +8,7 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
 import { DragControls } from 'three/addons/controls/DragControls'
 
 import GUI from 'lil-gui';
+import { World } from 'cannon';
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -24,6 +25,8 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 const draggableObjects = []
+
+
 
 /* 
     Lights
@@ -982,7 +985,6 @@ gltfLoader.load(
 
 
 
-
 // Set camera position
 camera.position.set(0, 10, 20);
 camera.lookAt(0, 0, 0);
@@ -997,8 +999,12 @@ const dragControls = new DragControls( [...draggableObjects], camera, canvas );
 let draggedObject = undefined
 let originalColorOfDraggedObject
 
+let placementY = 0
+
 dragControls.addEventListener('dragstart', function ( event ) {
   originalColorOfDraggedObject = event.object.material.color
+
+  placementY = event.object.position.y
 
   draggedObject = event.object
 
@@ -1009,15 +1015,48 @@ dragControls.addEventListener('dragstart', function ( event ) {
   event.object.position.set(event.object.position.x, 1,event.object.position.z)
 } );
 
+
 dragControls.addEventListener('drag', function ( event ) {
   
   event.object.castShadow = true;
   event.object.material.emissive.set( 0xaaaaaa );
+
   
   // make sure objects stay on the ground
-	event.object.position.set(event.object.position.x, 1,event.object.position.z)
+	event.object.position.set(event.object.position.x, placementY ,event.object.position.z)
 
+// console.log(scene)
+console.log(event.object)
+
+  if (event.object.position.x > 19 ) { 
+    // bedroom window
+    event.object.position.x = 18.9
+  }
+  if (event.object.position.x < -1 ) {
+    // living room window
+    event.object.position.x = -0.9
+  }
+  
+  // if (event.object.position.y > 1) {
+  //   event.object.position.y = 1
+  // }
+  // if (event.object.position.y < -1) {
+  //   event.object.position.y = -1
+  // }
+
+  if (event.object.position.z > 6.5) {
+    event.object.position.z = 6.5
+  }
+  if (event.object.position.z < -6.5) {
+    event.object.position.z = -6.5
+  }
+
+  orbitControls.enabled = false
+  
+  
 } );
+
+
 
 dragControls.addEventListener('dragend', function ( event ) {
 
@@ -1027,6 +1066,9 @@ dragControls.addEventListener('dragend', function ( event ) {
   event.object.castShadow = false;
 
   draggedObject = undefined
+
+  orbitControls.enabled = true
+
 
 } );
 
