@@ -8,7 +8,6 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
 import { DragControls } from 'three/addons/controls/DragControls'
 
 import GUI from 'lil-gui';
-import { World } from 'cannon';
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -19,6 +18,7 @@ const canvas = document.querySelector('canvas.webgl')
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ canvas: canvas });
+const worldPosition = new THREE.Vector3();
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.BasicShadowMap; // default THREE.PCFShadowMap
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -26,6 +26,181 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 const draggableObjects = []
 
+/* 
+    Grid
+*/
+// Set up a 2D array to represent the room
+const roomDepth = 20; // x
+const roomHeight = 3; // y
+const roomWidth = 13; // z
+const roomGrid = Array.from({ length: roomDepth }, () =>
+    Array.from({ length: roomHeight }, () => Array(roomWidth).fill(0))
+);
+
+
+// const roomGrid = Array.from({ length: roomDepth }, () =>
+//     Array.from({ length: roomWidth }, () => Array(roomHeight).fill(0))
+// );
+// below kind of works
+// const roomGrid = Array.from({ length: roomWidth }, () =>
+//     Array.from({ length: roomDepth }, () => Array(roomHeight).fill(0))
+// );
+
+// below does not work
+// const roomGrid = Array.from({ length: roomHeight }, () =>
+//     Array.from({ length: roomWidth }, () => Array(roomDepth).fill(0))
+// );
+
+
+function checkIfInitialPlacementIsPossibleX(x, y, z, depth, height, width) {
+  console.log('X - args: ', ...arguments)
+  let result = true 
+  for (let i = 0; i < depth; i++) {
+    console.log('X - result - pre: ', result)
+    result =  roomGrid[x + i][y][z] === 0;
+    console.log('X - roomGrid[x + i][y][z]: ', roomGrid[x + i][y][z])
+  }
+  console.log('X - result: ', result)
+  return result
+  
+}
+function checkIfInitialPlacementIsPossibleY(x, y, z, depth, height, width) {
+  console.log('Y - args: ', ...arguments)
+  let result = true
+    for (let i = 0; i < height; i++) {
+      console.log('Y - result - pre: ', result)
+      result = roomGrid[x][y + i][z] === 0;
+      console.log('Y - roomGrid[x][y + i][z]: ', roomGrid[x][y + i][z])
+    }
+    console.log('Y - result: ', result)
+    return result
+}
+function checkIfInitialPlacementIsPossibleZ(x, y, z, depth, height, width) {
+  console.log('Z - args: ', ...arguments)
+
+  let result = true
+    for (let i = 0; i < width; i++) {
+      console.log('Z - result - pre: ', result)
+      result = roomGrid[x][y][z + i] === 0;
+      console.log('Z - roomGrid[x][y][z + i]: ', roomGrid[x][y][z + i])
+    }  
+    console.log('Z - result: ', result)
+    return result
+}
+
+function placeFurnitureOnRoomGrid(x, y, z, depth, height, width){
+            for (let i = 0; i < depth; i++) {
+            roomGrid[x + i][y][z] = 'boxColor - X';
+          }
+          for (let i = 0; i < height; i++) {
+            roomGrid[x][y + i][z] = 'boxColor - Y';
+          }
+          for (let i = 0; i < width; i++) {
+            roomGrid[x][y][z + i] = 'boxColor - Z';
+          }
+}
+
+// Function to place furniture in the room
+function placeFurniture(x, y, z, boxColor, depth, height, width) {
+  
+  // Check if the cell is within the bounds of the room grid
+  // if (x >= 0 && x < roomDepth && y >= 0 && y < roomHeight && z >= 0 && z < roomWidth) {
+    if (x >= 0 && x < roomDepth && y >= 0 && y < roomHeight && z >= 0 && z < roomWidth) {
+      // Check if the cell is empty
+      if (checkIfInitialPlacementIsPossibleX(x, y, z, boxColor, depth, height, width) && checkIfInitialPlacementIsPossibleY(x, y, z, boxColor, depth, height, width) && checkIfInitialPlacementIsPossibleZ(x, y, z, boxColor, depth, height, width)) {
+      // if (roomGrid[x][y][z] === 0) {
+          // Place furniture (represented by value 1) in the cell
+          // roomGrid[x][y][z] = 'Y';
+          // roomGrid[x][y][z] = 'Y';
+          // roomGrid[x][y][z] = 'Y';
+
+          // for (let i = 0; i < depth; i++) {
+          //   roomGrid[x + i][y][z] = 'K';
+          // }
+          // for (let i = 0; i < height; i++) {
+          //   roomGrid[x][y + i][z] = 'S';
+          // }
+          // for (let i = 0; i < width; i++) {
+          //   roomGrid[x][y][z + i] = 'P';
+          // }
+
+          placeFurnitureOnRoomGrid(x, y, z, depth, height, width)
+
+          // Create a cube representing the furniture
+          const geometry = new THREE.BoxGeometry(width, height, depth);
+          const material = new THREE.MeshBasicMaterial({ color: boxColor });
+          const cube = new THREE.Mesh(geometry, material);
+          cube.position.set(x, y, z);
+          scene.add(cube);
+          console.log('cube: ', boxColor, cube)
+          console.log(roomGrid)
+          return cube; // Return the cube object for later reference
+      }
+      else { alert("placement is not possible") }
+  }
+
+}
+
+// Example: Place some furniture in the room
+// const furniture1 = placeFurniture(0, 0, 0, 'yellow', 3, 3, 3);
+// const furniture2 = placeFurniture(15, 0, 0, 'red', 1, 2, 1);
+// const furniture3 = placeFurniture(2, 2, 2, 'blue', 1, 1, 1);
+// const furniture4 = placeFurniture(0, 0, 10, 'green', 2, 2, 2);
+// const furniture5 = placeFurniture(14, 0, 9, 'purple', 3, 3, 3);
+
+
+// Function to move furniture to a new position
+function moveFurniture(cube, newX, newY, newZ) {
+  console.log('moveFurniture - args: ', ...arguments) // couchMatrix  1 0 7 // couchMatrix  1 0 8
+  if (newX >= 0 && newX < roomDepth && newY >= 0 && newY < roomHeight && newZ >= 0 && newZ < roomWidth) {
+    // Check if the cell is empty
+    if (roomGrid[newX][newY][newZ] === 0) {
+      console.log('moveFurniture - cube: ', cube) 
+      console.log('moveFurniture - cube.position: ', cube.position) 
+          // Clear the old position in the room grid
+          roomGrid[cube.position.x][cube.position.y][cube.position.z] = 0;
+          // Update the cube position
+          cube.position.set(newX, newY, newZ);
+          // Update the room grid with the new position
+          roomGrid[newX][newY][newZ] = 'X';
+
+          placeFurnitureOnRoomGrid(newX, newY, newZ, cube.geometry.parameters.depth, cube.geometry.parameters.height, cube.geometry.parameters.width)
+
+
+          // cube.geometry.parameters.depth
+          // cube.geometry.parameters.height
+          // cube.geometry.parameters.width
+          
+          // for (let i = 0; i < cube.geometry.parameters.depth; i++) {
+          //   roomGrid[newX + i][newY][newZ] = 'K';
+          // }
+          // for (let i = 0; i < cube.geometry.parameters.height; i++) {
+          //   roomGrid[newX][newY + i][newZ] = 'S';
+          // }
+          // for (let i = 0; i < cube.geometry.parameters.width; i++) {
+          //   roomGrid[newX][newY][newZ + i] = 'P';
+          // }
+      }
+  }
+  console.log('roomGrid: ', roomGrid)
+
+}
+
+    
+    // Example: Move furniture1 to a new position
+    // moveFurniture(furniture1, 3, 2, 3);
+    // moveFurniture(furniture1, 19, 1, 12);
+    // moveFurniture(furniture1, roomDepth-2, roomHeight-2, roomWidth-2);
+    // moveFurniture(furniture2, roomDepth-5, roomHeight-1, roomWidth-5);
+    // moveFurniture(furniture3, 17, 1, 13);
+ 
+    // console.log('furniture1: ', furniture1.position)
+    // console.log('furniture2: ', furniture2.position)
+    // console.log('furniture3: ', furniture3.position)
+
+    // console.log('roomGrid: ', roomGrid)
+
+ 
 
 
 /* 
@@ -837,8 +1012,15 @@ bedroomWindow.position.set(-2.9, 0.05, -15);
 const couch = createCouch();
 scene.add(couch);
 couch.position.set(0, -1, 6.5)
+couch.name = 'couch'
 couch.rotateY(Math.PI / 2)
+// const couchMatrix = placeFurniture(1, 0, 1, 'blue', 3, 1, 2);
+const couchMatrix = placeFurniture(0, 0, 6, 'blue', 3, 1, 2);
+couchMatrix.name = `${couch.name}Matrix`
 draggableObjects.push( couch );
+
+couch.getWorldPosition(worldPosition);
+console.log('World position - couch:', worldPosition);
   
 // Create the wood block with cubby holes
 const woodBlock = createWoodBlock();
@@ -857,7 +1039,12 @@ draggableObjects.push( indoorDogPen );
 const blackBlueDesk = createBlackBlueDesk();
 scene.add(blackBlueDesk);
 blackBlueDesk.position.set(-5.5, -1, 1)
+blackBlueDesk.name = 'blackBlueDesk'
+const blackBlueDeskMatrix = placeFurniture(0, 0, 10, 'red', 1, 1, 1);
+blackBlueDeskMatrix.name = `${blackBlueDeskMatrix.name}Matrix`
 draggableObjects.push( blackBlueDesk );
+blackBlueDesk.getWorldPosition(worldPosition);
+console.log('World position - blackBlueDesk:', worldPosition);
 
 // Create the bookshelf
 const bookshelf = createBookshelf();
@@ -877,7 +1064,13 @@ const flatScreenTV = createFlatScreenTV();
 scene.add(flatScreenTV);
 flatScreenTV.position.set(5, 1.3, 7.1)
 flatScreenTV.rotateY( (- Math.PI - 3.5) / 3 )
+flatScreenTV.name = 'flatScreenTV'
+const flatScreenTVMatrix = placeFurniture(5, 0, 7, 'green', 1, 1, 1);
+// flatScreenTVMatrix.rotateY( (- Math.PI - 3.5) / 3 )
+flatScreenTVMatrix.name = `${flatScreenTVMatrix.name}Matrix`
 draggableObjects.push( flatScreenTV );
+flatScreenTV.getWorldPosition(worldPosition);
+console.log('World position - flatScreenTV:', flatScreenTV);
 
 // Create the metal table
 const metalTable = createMetalTable();
@@ -934,13 +1127,26 @@ scene.add(bed);
 bed.position.set(5.5, -1.5, -12)
 bed.rotateY(Math.PI / 2)
 // livingRoomSamuraiPainting.rotateZ(Math.PI / 2)
+bed.name = 'bed'
+const bedMatrix = placeFurniture(14, 0, 10, 'yellow', 3, 1, 2);
+bedMatrix.name = `${couch.name}Matrix`
 draggableObjects.push( bed );
+bed.getWorldPosition(worldPosition);
+console.log('World position - bed:', worldPosition);
 
 // Create the bathtub
 const bathtub = createBathtub();
 scene.add(bathtub);
 bathtub.position.set(-6, -1, -10.9);
 
+
+const furnitureMap = {
+  couch: couchMatrix,
+  bed: bedMatrix,
+  blackBlueDesk: blackBlueDeskMatrix,
+  flatScreenTV: flatScreenTVMatrix
+  // Add more mappings for other furniture pieces as needed
+};
 
 /**
  * Models
@@ -992,6 +1198,15 @@ camera.lookAt(0, 0, 0);
 // Set up controls
 const orbitControls = new OrbitControls(camera, canvas);
 
+// Create a Vector3 to represent local coordinates relative to the object
+const localPosition = new THREE.Vector3(0, 0, 0); // Assuming you want the coordinates at the origin of the object
+
+
+
+// Convert local coordinates to world coordinates
+// const worldPosition = object.localToWorld(localPosition);
+
+// console.log('World coordinates:', worldPosition);
 
 /* UNCOMMENT BELOW TO ENABLE DRAG CONTROLS */
 const dragControls = new DragControls( [...draggableObjects], camera, canvas );
@@ -1012,46 +1227,146 @@ dragControls.addEventListener('dragstart', function ( event ) {
   event.object.castShadow = true;
 
   // make sure objects stay on the ground
-  event.object.position.set(event.object.position.x, 1,event.object.position.z)
+  // event.object.position.set(event.object.position.x, 1,event.object.position.z)
 } );
 
 
 dragControls.addEventListener('drag', function ( event ) {
-  
+  console.log(' --- drag - event: ', event)
+  console.log(' --- drag - couchMatrix: ', couchMatrix)
   event.object.castShadow = true;
   event.object.material.emissive.set( 0xaaaaaa );
 
+  // const localPosition = new THREE.Vector3(event.object.position.x, event.object.position.y, event.object.position.z); // Assuming you want the coordinates at the origin of the object
+
+
+  // Get the object's world position
+// const worldPosition = event.object.position.clone(); // Clone to prevent modifying the original position
+
+  // const worldPosition = event.object.localToWorld(localPosition);
   
+  // console.log('World coordinates:', worldPosition);
   // make sure objects stay on the ground
-	event.object.position.set(event.object.position.x, placementY ,event.object.position.z)
-
-// console.log(scene)
-console.log(event.object)
-
-  if (event.object.position.x > 19 ) { 
-    // bedroom window
-    event.object.position.x = 18.9
-  }
-  if (event.object.position.x < -1 ) {
-    // living room window
-    event.object.position.x = -0.9
-  }
+	// event.object.position.set(event.object.position.x, placementY ,event.object.position.z)
   
-  // if (event.object.position.y > 1) {
-  //   event.object.position.y = 1
-  // }
-  // if (event.object.position.y < -1) {
-  //   event.object.position.y = -1
-  // }
+  // console.log(scene)
+console.log(' --- event.object: ',event.object)
+let objectWPos = event.object.getWorldPosition(worldPosition);
+console.log(' --- objectWPos: ', objectWPos)
 
-  if (event.object.position.z > 6.5) {
-    event.object.position.z = 6.5
-  }
-  if (event.object.position.z < -6.5) {
-    event.object.position.z = -6.5
-  }
+  // if (worldPosition.x > 19 ) { 
+  //   // bedroom window
+  //   worldPosition.x = 18.9
+  // }
+  // if (worldPosition.x < -1 ) {
+  //   // living room window
+  //   worldPosition.x = -0.9
+  // }
+  
+  // // if (event.object.position.y > 1) {
+  // //   event.object.position.y = 1
+  // // }
+  // // if (event.object.position.y < -1) {
+  // //   event.object.position.y = -1
+  // // }
+
+  // if (worldPosition.z > 6.5) {
+  //   worldPosition.z = 6
+  // }
+  // if (worldPosition.z < -6.5) {
+  //   worldPosition.z = -6
+  // }
 
   orbitControls.enabled = false
+
+
+/*
+  array positions need to come from WorldPosition,
+  so they are consistent across all furnitures
+
+  initial start point for Matrix objects needs to be in WP
+    - array of arrays may need to reworked
+
+  method needs to be written to translate ObjPosition to WorldPos for Matrix Objs
+
+
+  - bed starting position - {
+    "x": -0.6319193099130764,
+    "y": -175.13044230019932,
+    "z": -6
+}
+
+  - bed in storage closet - {
+    "x": -0.9,
+    "y": -87.79625542556875,
+    "z": -6
+}
+
+  - bed entrance door - {
+    "x": 0.5516247415416533,
+    "y": -2284.974825562243,
+    "z": 6.373747866145903
+}
+
+  - bed tv stand - {
+    "x": 6.458827850257878,
+    "y": -2339.0941801478198,
+    "z": 0.7936768478081362
+}
+
+*/
+
+  const nameOfMatrixObject = furnitureMap[event.object.parent.name]
+
+  // console.log(' --- event.object.position: ', event.object.position)
+  // console.log(' --- worldPosition: ', worldPosition)
+
+  // console.log(' --- Math.abs(Math.ceil(event.object.position.x)): ', Math.abs(Math.ceil(event.object.position.x)))
+  // console.log(' --- Math.abs(Math.ceil(event.object.position.z)): ', Math.abs(Math.ceil(event.object.position.z)))
+  // moveFurniture(nameOfMatrixObject, event.object.position.x, Math.round(placementY), event.object.position.z);
+  
+  
+  // Convert world coordinates to grid coordinates
+  const gridX = Math.floor(Math.abs(objectWPos.x)*1.06); // Assuming x corresponds to the width in the roomGrid
+  // const gridX = Math.abs(Math.floor(worldPosition.x)); // Assuming x corresponds to the width in the roomGrid
+  const gridY = placementY; // Assuming y corresponds to the height in the roomGrid
+  // const gridY = Math.floor(worldPosition.y); // Assuming y corresponds to the height in the roomGrid
+  // const gridZ = Math.abs(Math.floor(worldPosition.z)); // Invert z-axis to match grid layout; A
+  const gridZ = Math.floor(Math.abs(objectWPos.z)*1.01); // Invert z-axis to match grid layout; A
+  // const gridZ = Math.abs(Math.floor(objectWPos.z)); // Invert z-axis to match grid layout; A
+  
+  console.log(' --- gridX: ', gridX)
+  console.log(' --- gridY: ', gridY)
+  console.log(' --- gridZ: ', gridZ)
+// // Update the roomGrid matrix based on the new grid coordinates
+// if (gridX >= 0 && gridX < roomDepth && gridY >= 0 && gridY < roomHeight && gridZ >= 0 && gridZ < roomWidth) {
+// // if (gridX >= 0 && gridX < roomWidth && gridY >= 0 && gridY < roomHeight && gridZ >= 0 && gridZ < roomDepth) {
+//   // Clear the old position in the roomGrid
+//   roomGrid[gridX][gridY][gridZ] = 0;
+//   // Update the roomGrid with the new position
+//   roomGrid[gridX][gridY][gridZ] = 1; // Set it to 1 to indicate the presence of the object at this position
+// }
+
+// // // Now, update the position of the corresponding matrix object
+// // if (nameOfMatrixObject) {
+// //   nameOfMatrixObject.position.copy(objectWPos);
+// // }
+
+
+  moveFurniture(nameOfMatrixObject, gridX, 0, gridZ );
+  // moveFurniture(nameOfMatrixObject, Math.ceil(Math.abs(event.object.position.x)), Math.round(placementY), Math.ceil(Math.abs(event.object.position.z)) );
+  
+  // moveFurniture(nameOfMatrixObject, Math.ceil(Math.abs(localPosition.x)), Math.round(placementY), Math.ceil(Math.abs(localPosition.z)) );
+  // moveFurniture(nameOfMatrixObject, Math.ceil(Math.abs(worldPosition.x)), Math.round(placementY), Math.ceil(Math.abs(worldPosition.z)) );
+
+  // moveFurniture(nameOfMatrixObject, Math.abs(Math.ceil(localPosition.x+1)), Math.round(placementY), Math.abs(Math.ceil(localPosition.z+6)) );
+  // moveFurniture(nameOfMatrixObject, Math.abs(Math.ceil(worldPosition.x+1)), Math.round(placementY), Math.abs(Math.ceil(worldPosition.z+6)) );
+  // moveFurniture(nameOfMatrixObject, Math.abs(Math.ceil(event.object.position.x+1)), Math.round(placementY), Math.abs(Math.ceil(event.object.position.z+6)) );
+  
+  // moveFurniture(couchMatrix, Math.abs(Math.ceil(event.object.position.x)) , Math.round(placementY), Math.abs(Math.ceil(event.object.position.z+6)) );
+  // moveFurniture(furniture3, Math.abs(Math.ceil(event.object.position.x)) , Math.round(placementY), Math.abs(Math.ceil(event.object.position.z+6)) );
+  // moveFurniture(furniture1, 19, 1, 12);
+
   
   
 } );
@@ -1068,6 +1383,7 @@ dragControls.addEventListener('dragend', function ( event ) {
   draggedObject = undefined
 
   orbitControls.enabled = true
+  // moveFurniture(furniture5, Math.abs(Math.ceil(event.object.position.x)) , Math.round(placementY), Math.abs(Math.ceil(event.object.position.z+6)) );
 
 
 } );
