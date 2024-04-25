@@ -8,7 +8,6 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
 import { DragControls } from 'three/addons/controls/DragControls'
 
 import GUI from 'lil-gui';
-import { World } from 'cannon';
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -25,6 +24,156 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 const draggableObjects = []
+
+
+// Define room dimensions
+const roomWidth = 20; // Along the x-axis
+const roomDepth = 13; // Along the z-axis
+
+// Create a 2D array to represent the room, initialized with zeros
+const roomArray = Array.from({ length: roomDepth }, () =>
+  Array.from({ length: roomWidth }, () => 0)
+);
+
+// Define the range of coordinates in the Three.js model
+const minXModel = -6.5;
+const maxXModel = 6.5;
+const minZModel = 7;
+const maxZModel = -13;
+
+// Define the range of coordinates in the array
+const minXArray = 0;
+const maxXArray = roomWidth;
+const minZArray = 0;
+const maxZArray = roomDepth;
+
+// Calculate the scale factor and offset for X coordinate
+const scaleX = (maxXArray - minXArray) / (maxXModel - minXModel);
+const offsetX = minXArray - minXModel * scaleX;
+
+// Calculate the scale factor and offset for Z coordinate
+const scaleZ = (maxZArray - minZArray) / (maxZModel - minZModel);
+const offsetZ = minZArray - minZModel * scaleZ;
+
+// // Function to convert coordinates from Three.js model range to array range
+// function convertCoordinates(xModel, zModel) {
+//   console.log(' --- convertCoordinates - args: ', ...arguments)
+//   console.log(' --- convertCoordinates - xModel, scaleX, offsetX: ', xModel, scaleX, offsetX)
+//   console.log(' --- convertCoordinates - zModel, scaleZ, offsetZ: ', zModel, scaleZ, offsetZ)
+//   const xArray = xModel * scaleX + offsetX;
+//   const zArray = zModel * scaleZ + offsetZ;
+//   console.log(' --- convertCoordinates - { x: xArray, z: zArray }: ', { x: xArray, z: zArray })
+//   return { x: xArray, z: zArray };
+// }
+
+// // Function to convert coordinates from Three.js model range to array range
+// function convertCoordinates(xModel, zModel, cellSize) {
+//   console.log(' --- convertCoordinates - args: ', ...arguments)
+//   // Convert game level coordinates to grid level coordinates
+//   let gridX = Math.round(xModel / cellSize);
+//   let gridZ = Math.round(zModel / cellSize);
+//   console.log(' --- convertCoordinates - gridX1: ', gridX)
+//   console.log(' --- convertCoordinates - gridZ1: ', gridZ)
+  
+//   // Clamp grid coordinates to stay within room bounds
+//   gridX = Math.max(0, Math.min(gridX, roomWidth - 1));
+//   gridZ = Math.max(0, Math.min(gridZ, roomDepth - 1));
+//   console.log(' --- convertCoordinates - gridX2: ', gridX)
+//   console.log(' --- convertCoordinates - gridZ2: ', gridZ)
+  
+//   // Convert grid coordinates to array coordinates
+//   const xArray = gridX * scaleX + offsetX;
+//   const zArray = gridZ * scaleZ + offsetZ;
+//   console.log(' --- convertCoordinates - xArray: ', xArray)
+//   console.log(' --- convertCoordinates - zArray: ', zArray)
+
+//   // Return array coordinates
+//   return { x: xArray, z: zArray };
+// }
+
+// Function to convert coordinates from Three.js model range to array range
+function convertCoordinates(xModel, zModel) {
+    console.log(' --- convertCoordinates - args: ', ...arguments)
+    
+    // Clamp model coordinates to stay within room bounds
+    const clampedXModel = Math.max(0, Math.min(xModel, roomWidth));
+    const clampedZModel = Math.max(0, Math.min(zModel, roomDepth));
+    console.log(' --- convertCoordinates - clampedXModel: ', clampedXModel)
+    console.log(' --- convertCoordinates - clampedZModel: ', clampedZModel)
+    
+    // Convert clamped model coordinates to array coordinates
+    const xArray = clampedXModel * scaleX + offsetX;
+    const zArray = clampedZModel * scaleZ + offsetZ;
+    console.log(' --- convertCoordinates - xArray: ', xArray)
+    console.log(' --- convertCoordinates - zArray: ', zArray)
+
+  // Return array coordinates
+  return { x: xArray, z: zArray };
+}
+
+// Function to check if a given position in the room array is empty
+function isCellEmpty(x, z) {
+  // console.log(' --- isCellEmpty - args: ', ...arguments)
+  // console.log(' --- isCellEmpty - roomArray: ', roomArray)
+  // console.log(' --- isCellEmpty - roomArray[z][x]: ', roomArray[z][x])
+  return roomArray[z][x] === 0;
+}
+
+
+// Define variables to store previous and current positions
+let previousPosition = { x: 0, z: 0 };
+let currentPosition = { x: 0, z: 0 };
+
+
+// Function to update room array when furniture is added or moved
+function updateRoomArray(furniture) {
+  console.log(' --- updateRoomArray - args: ', ...arguments)
+
+  // Reset all coordinates in the room array to 0
+  roomArray.forEach(row => row.fill(0));
+
+  // Convert furniture position to grid coordinates
+  let { x, z } = convertCoordinates(furniture.position.x, furniture.position.z, 1);
+  let gridX = Math.floor(x);
+  let gridZ = Math.floor(z);
+
+  // Handle collision detection and repositioning
+  if (!isCellEmpty(gridX, gridZ)) {
+    // Try adjacent cells
+    if (isCellEmpty(gridX + 1, gridZ)) {
+      gridX++;
+    } else if (isCellEmpty(gridX, gridZ + 1)) {
+      gridZ++;
+    } else {
+      // If no adjacent empty cells, move to the next row
+      gridX = previousPosition.x
+      gridZ = previousPosition.z
+      // gridX = Math.floor(Math.random() * roomWidth);
+      // gridZ = Math.floor(Math.random() * roomDepth);
+      console.log('gridX: ', gridX)
+      console.log('gridZ: ', gridZ)
+    }
+  }
+
+  // Clamp grid coordinates to ensure they are within the bounds of the room array
+  gridX = Math.min(Math.max(gridX, 0), roomWidth - 1);
+  gridZ = Math.min(Math.max(gridZ, 0), roomDepth - 1);
+
+  // Update object position to the nearest valid coordinates
+  furniture.position.x = gridX + 0.5; // Adjust for center of grid cell
+  furniture.position.z = gridZ + 0.5; // Adjust for center of grid cell
+
+
+   // Store previous position before updating
+   previousPosition = { x: currentPosition.x, z: currentPosition.z };
+  
+   // Store current position
+   currentPosition = { x: gridX, z: gridZ };
+
+
+  // Update room array based on the corrected position
+  roomArray[gridZ][gridX] = furniture; // Set cell to 1 to indicate presence of furniture
+}
 
 
 
@@ -738,7 +887,7 @@ function createSmallPainting(color) {
 function createBed() {
     const bed = new THREE.Group();
   
-    // Create the main body of the couch
+    // Create the main body of the bed
     const bedGeometry = new THREE.BoxGeometry(6, 2, 4);
     const bedBody = new THREE.Mesh(bedGeometry, bedMaterial);
     bed.add(bedBody);
@@ -994,6 +1143,15 @@ const orbitControls = new OrbitControls(camera, canvas);
 
 
 /* UNCOMMENT BELOW TO ENABLE DRAG CONTROLS */
+
+// const furnitureMap = {
+//   couch: couchMatrix,
+//   bed: bedMatrix,
+//   blackBlueDesk: blackBlueDeskMatrix,
+//   flatScreenTV: flatScreenTVMatrix
+//   // Add more mappings for other furniture pieces as needed
+// };
+
 const dragControls = new DragControls( [...draggableObjects], camera, canvas );
 
 let draggedObject = undefined
@@ -1012,7 +1170,9 @@ dragControls.addEventListener('dragstart', function ( event ) {
   event.object.castShadow = true;
 
   // make sure objects stay on the ground
-  event.object.position.set(event.object.position.x, 1,event.object.position.z)
+  // event.object.position.set(event.object.position.x, 1,event.object.position.z)  
+  event.object.position.y = placementY
+
 } );
 
 
@@ -1021,38 +1181,49 @@ dragControls.addEventListener('drag', function ( event ) {
   event.object.castShadow = true;
   event.object.material.emissive.set( 0xaaaaaa );
 
-  
+  // create a new Vector3 to store the world position
+const worldPosition = new THREE.Vector3();
+
+// get the world position of the object
+const WP = event.object.getWorldPosition(worldPosition)
+console.log('this - WP: ', WP)
+console.log('this - ep: ', event.object.position)
+
   // make sure objects stay on the ground
-	event.object.position.set(event.object.position.x, placementY ,event.object.position.z)
+	event.object.position.y = placementY
+	// event.object.position.set(event.object.position.x, placementY ,event.object.position.z)
 
 // console.log(scene)
 console.log(event.object)
 
-  if (event.object.position.x > 19 ) { 
-    // bedroom window
-    event.object.position.x = 18.9
-  }
-  if (event.object.position.x < -1 ) {
-    // living room window
-    event.object.position.x = -0.9
-  }
+  // if (event.object.position.x > 19 ) { 
+  //   // bedroom window
+  //   event.object.position.x = 18.9
+  // }
+  // if (event.object.position.x < -1 ) {
+  //   // living room window
+  //   event.object.position.x = -0.9
+  // }
   
-  // if (event.object.position.y > 1) {
-  //   event.object.position.y = 1
-  // }
-  // if (event.object.position.y < -1) {
-  //   event.object.position.y = -1
-  // }
+  // // if (event.object.position.y > 1) {
+  // //   event.object.position.y = 1
+  // // }
+  // // if (event.object.position.y < -1) {
+  // //   event.object.position.y = -1
+  // // }
 
-  if (event.object.position.z > 6.5) {
-    event.object.position.z = 6.5
-  }
-  if (event.object.position.z < -6.5) {
-    event.object.position.z = -6.5
-  }
+  // if (event.object.position.z > 6.5) {
+  //   event.object.position.z = 6.5
+  // }
+  // if (event.object.position.z < -6.5) {
+  //   event.object.position.z = -6.5
+  // }
 
   orbitControls.enabled = false
   
+
+  updateRoomArray(event.object)
+
   
 } );
 
