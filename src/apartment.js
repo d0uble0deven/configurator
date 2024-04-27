@@ -833,12 +833,12 @@ livingRoomWindow.position.set(2, 0.05, 10);
 const bedroomWindow = createWindow(2, 4, 0.1, windowMaterial);
 bedroomWindow.position.set(-2.9, 0.05, -15);
 
-// Create the three-person couch
-const couch = createCouch();
-scene.add(couch);
-couch.position.set(0, -1, 6.5)
-couch.rotateY(Math.PI / 2)
-draggableObjects.push( couch );
+// // Create the three-person couch
+// const couch = createCouch();
+// // scene.add(couch);
+// couch.position.set(0, -1, 6.5)
+// couch.rotateY(Math.PI / 2)
+// draggableObjects.push( couch );
   
 // Create the wood block with cubby holes
 const woodBlock = createWoodBlock();
@@ -928,18 +928,17 @@ livingRoomSamuraiPainting.rotateY(Math.PI / 2)
 // livingRoomSamuraiPainting.rotateZ(Math.PI / 2)
 draggableObjects.push( livingRoomSamuraiPainting );
 
-// Create the bed
-const bed = createBed(bedMaterial);
-scene.add(bed);
-bed.position.set(5.5, -1.5, -12)
-bed.rotateY(Math.PI / 2)
-// livingRoomSamuraiPainting.rotateZ(Math.PI / 2)
-draggableObjects.push( bed );
+// // Create the bed
+// const bed = createBed(bedMaterial);
+// // scene.add(bed);
+// bed.position.set(5.5, -1.5, -12)
+// bed.rotateY(Math.PI / 2)
+// draggableObjects.push( bed );
 
-// Create the bathtub
-const bathtub = createBathtub();
-scene.add(bathtub);
-bathtub.position.set(-6, -1, -10.9);
+// // Create the bathtub
+// const bathtub = createBathtub();
+// scene.add(bathtub);
+// bathtub.position.set(-6, -1, -10.9);
 
 
 /**
@@ -948,6 +947,7 @@ bathtub.position.set(-6, -1, -10.9);
 const dracoLoader = new DRACOLoader()
 
 dracoLoader.setDecoderPath('/draco/')
+
 // Fox
 const gltfLoader = new GLTFLoader()
 gltfLoader.setDRACOLoader(dracoLoader)
@@ -981,6 +981,84 @@ gltfLoader.load(
         console.log('error')
         console.log(error)
     }
+)
+
+gltfLoader.load(
+  '/models/furnitures/furnitures.gltf',
+  (furnitures) => {
+      console.log('furnitures: ','success')
+      console.log('furnitures: ', furnitures)
+      console.log('furnitures.children: ', furnitures.scene.children[0].children)
+        
+      const bed = furnitures.scene.children[0].children[2]
+      
+      console.log('bed: ', bed.material)
+      bed.material.color.set('#007FFF')
+      bed.scale.set(200, 115, 115)
+      bed.position.set(4.5, -2.5, -11.75)
+      bed.rotation.set(0, Math.PI * 2, 0)
+
+
+
+      scene.add(bed)
+
+  },
+  (progress) => {
+      console.log('furnitures: ','progress')
+      console.log('furnitures: ',progress)
+  },
+  (error) => {
+      console.log('furnitures: ','error')
+      console.log('furnitures: ',error)
+  }
+)
+gltfLoader.load(
+  '/models/bathroom_modern/bathroom_modern.gltf',
+  (bathroom_modern) => {
+      console.log('bathroom_modern: ','success')
+      console.log('bathroom_modern: ', bathroom_modern)
+
+      bathroom_modern.scene.scale.set(.8, .6, .3)
+      bathroom_modern.scene.position.set(-5.6, -2, -6.5)
+      bathroom_modern.scene.rotation.set(0, -(Math.PI * 0.5), 0)
+
+      scene.add(bathroom_modern.scene)
+
+  },
+  (progress) => {
+      console.log('bathroom_modern: ','progress')
+      console.log('bathroom_modern: ',progress)
+  },
+  (error) => {
+      console.log('bathroom_modern: ','error')
+      console.log('bathroom_modern: ',error)
+  }
+)
+gltfLoader.load(
+  '/models/blue_couch/blue_couch.gltf',
+  (blue_couch) => {
+      console.log('blue_couch: ','success')
+      console.log('blue_couch: ', blue_couch)
+
+      blue_couch.scene.scale.set(30, 30, 30)
+      blue_couch.scene.position.set(0.5, -2.5, 6.2)
+      blue_couch.scene.rotation.set(0, Math.PI/2, 0)
+
+      // blue_couch.scene.material.color.set('#9ACEEB')
+      // blue_couch.material.color.set('#9ACEEB')
+
+
+      scene.add(blue_couch.scene)
+
+  },
+  (progress) => {
+      console.log('blue_couch: ','progress')
+      console.log('blue_couch: ',progress)
+  },
+  (error) => {
+      console.log('blue_couch: ','error')
+      console.log('blue_couch: ',error)
+  }
 )
 
 
