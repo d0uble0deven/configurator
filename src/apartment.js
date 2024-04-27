@@ -175,9 +175,9 @@ const fridgeMaterial = new THREE.MeshPhongMaterial({ color: 'white', side: THREE
 const woodMaterial = new THREE.MeshPhongMaterial({ color: 0x8B4513, side: THREE.DoubleSide });
 const openMaterial = new THREE.MeshPhongMaterial({ color: 'black', transparent: true, opacity: 0.5 });
 
-// Couch materials
-const couchMaterial = new THREE.MeshPhongMaterial({ color: '#1560bd' }); // Light blue color
-// const cushionMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff }); // White color for cushions
+// // Couch materials
+// const couchMaterial = new THREE.MeshPhongMaterial({ color: '#1560bd' }); // Light blue color
+// // const cushionMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff }); // White color for cushions
 
 // Dog pen materials
 const penWallMaterial = new THREE.MeshPhongMaterial({ color: 'black', transparent: true, opacity: 0.5, side: THREE.DoubleSide });
@@ -209,16 +209,16 @@ const metalTableMaterial = new THREE.MeshPhongMaterial({ color: 0x808080 }); // 
 const blackLeatherMaterial = new THREE.MeshPhongMaterial({ color: 0x000000  });
 const blueLeatherMaterial = new THREE.MeshPhongMaterial({ color: 0x0000FF  });
 
-// Bed material
-const bedMaterial = new THREE.MeshPhongMaterial({ color: 0x0000FF }); // Blue color for bed
+// // Bed material
+// const bedMaterial = new THREE.MeshPhongMaterial({ color: 0x0000FF }); // Blue color for bed
 
 // Painting material
 const paintingMaterialsRed = new THREE.MeshPhongMaterial({ color: '#65000B'  })
 const paintingMaterialsGreen = new THREE.MeshPhongMaterial({ color: '#043927'  })
 const paintingMaterialsBlue = new THREE.MeshPhongMaterial({ color: '#041E42'  })
 
-// Bathtub material
-const bathtubMaterial = new THREE.MeshPhongMaterial({ color: 0xFFFFFF }); // White color for the bathtub
+// // Bathtub material
+// const bathtubMaterial = new THREE.MeshPhongMaterial({ color: 0xFFFFFF }); // White color for the bathtub
 
 // Function to create a wall
 function createWall(width, height, depth, material) {
@@ -305,21 +305,21 @@ function createDoor(width, height, depth, material) {
   return doorFrame;
 }
 
-// Function to create a three-person couch
-function createCouch() {
-    const couch = new THREE.Group();
+// // Function to create a three-person couch
+// function createCouch() {
+//     const couch = new THREE.Group();
   
-    // Create the main body of the couch
-    const couchGeometry = new THREE.BoxGeometry(5, 2, 2);
-    const couchBody = new THREE.Mesh(couchGeometry, couchMaterial);
-    couch.add(couchBody);
+//     // Create the main body of the couch
+//     const couchGeometry = new THREE.BoxGeometry(5, 2, 2);
+//     const couchBody = new THREE.Mesh(couchGeometry, couchMaterial);
+//     couch.add(couchBody);
 
-    couch.receiveShadow = true
-    couch.castShadow = true
+//     couch.receiveShadow = true
+//     couch.castShadow = true
     
   
-    return couch;
-}
+//     return couch;
+// }
 
 // Function to create a simple metal table
 function createMetalTable() {
@@ -734,29 +734,29 @@ function createSmallPainting(color) {
     return painting
 }
 
-// Function to create a bed
-function createBed() {
-    const bed = new THREE.Group();
+// // Function to create a bed
+// function createBed() {
+//     const bed = new THREE.Group();
   
-    // Create the main body of the couch
-    const bedGeometry = new THREE.BoxGeometry(6, 2, 4);
-    const bedBody = new THREE.Mesh(bedGeometry, bedMaterial);
-    bed.add(bedBody);
+//     // Create the main body of the couch
+//     const bedGeometry = new THREE.BoxGeometry(6, 2, 4);
+//     const bedBody = new THREE.Mesh(bedGeometry, bedMaterial);
+//     bed.add(bedBody);
 
-    bed.receiveShadow = true
-    bed.castShadow = true
+//     bed.receiveShadow = true
+//     bed.castShadow = true
     
-    return bed;
-}
+//     return bed;
+// }
 
-// Function to create a simple bathtub
-function createBathtub() {  
-    // Create the bathtub body
-    const bathtubGeometry = new THREE.BoxGeometry(2.9, 2, 2);
-    const bathtub = new THREE.Mesh(bathtubGeometry, bathtubMaterial);
+// // Function to create a simple bathtub
+// function createBathtub() {  
+//     // Create the bathtub body
+//     const bathtubGeometry = new THREE.BoxGeometry(2.9, 2, 2);
+//     const bathtub = new THREE.Mesh(bathtubGeometry, bathtubMaterial);
     
-    return bathtub;
-}
+//     return bathtub;
+// }
 
 
 // Create living room with office space
@@ -845,31 +845,37 @@ const woodBlock = createWoodBlock();
 scene.add(woodBlock);
 woodBlock.position.set(-7.9, -1, 6)
 woodBlock.rotateY(Math.PI / 2)
+woodBlock.name = "woodBlock"    
 draggableObjects.push( woodBlock );
 
 // Create the indoor dog pen
 const indoorDogPen = createIndoorDogPen();
 scene.add(indoorDogPen);
 indoorDogPen.position.set(5.9, -1, 1.5)
+indoorDogPen.name = "indoorDogPen"    
 draggableObjects.push( indoorDogPen );
 
 // Create the black and blue desk
 const blackBlueDesk = createBlackBlueDesk();
 scene.add(blackBlueDesk);
 blackBlueDesk.position.set(-5.5, -1, 1)
+blackBlueDesk.name = "blackBlueDesk"    
 draggableObjects.push( blackBlueDesk );
 
 // Create the bookshelf
 const bookshelf = createBookshelf();
 scene.add(bookshelf);
-bookshelf.position.set(2, -2, .3)
+bookshelf.position.set(2, -2, .3)      
+bookshelf.name = "bookshelf"    
 draggableObjects.push( bookshelf );
+
 
 // Create the TV stand
 const tvStand = createTVStand();
 scene.add(tvStand);
 tvStand.position.set(5, -1, 7)
 tvStand.rotateY(Math.PI / 3)
+tvStand.name = "tvStand"
 draggableObjects.push( tvStand );
 
 // Create the flat-screen TV
@@ -877,6 +883,7 @@ const flatScreenTV = createFlatScreenTV();
 scene.add(flatScreenTV);
 flatScreenTV.position.set(5, 1.3, 7.1)
 flatScreenTV.rotateY( (- Math.PI - 3.5) / 3 )
+flatScreenTV.name = "flatScreenTV"
 draggableObjects.push( flatScreenTV );
 
 // Create the metal table
@@ -884,40 +891,47 @@ const metalTable = createMetalTable();
 scene.add(metalTable);
 metalTable.position.set(-2, -1, 6.5)
 metalTable.rotateY(Math.PI / 2)
+metalTable.name = "metalTable"
 draggableObjects.push( metalTable );
 
 // Create the office stand
 const officeStand = createOfficeStand();
 scene.add(officeStand);
 officeStand.position.set(-6, -1, -2)
+officeStand.name = "officeStand"
 draggableObjects.push( officeStand );
 
 // Create the leather chair
 const leatherChair = createLeatherChair();
 scene.add(leatherChair);
 leatherChair.position.set(-5.5, -1.7, 0)
+leatherChair.name = "leatherChair"
 draggableObjects.push( leatherChair );
 
 // Create the office paintings
 const officeSamuraiPainting = createLargePainting(paintingMaterialsRed);
 scene.add(officeSamuraiPainting);
 officeSamuraiPainting.position.set(-5.5, 1, -2.4)
+officeSamuraiPainting.name = "officeSamuraiPainting"
 draggableObjects.push( officeSamuraiPainting );
 
 const officeRoshaschPainting = createSmallPainting(paintingMaterialsBlue);
 scene.add(officeRoshaschPainting);
 officeRoshaschPainting.position.set(-6.75, 1.5, -2.4)
+officeRoshaschPainting.name = "officeRoshaschPainting"
 draggableObjects.push( officeRoshaschPainting );
 
 const officeJesterPainting = createSmallPainting(paintingMaterialsGreen);
 scene.add(officeJesterPainting);
 officeJesterPainting.position.set(-6.75, 0.5, -2.4)
+officeJesterPainting.name = "officeJesterPainting"
 draggableObjects.push( officeJesterPainting );
 
 // Create the entrance paintings
 const entranceSamuraiPainting = createLargePainting(paintingMaterialsGreen);
 scene.add(entranceSamuraiPainting);
 entranceSamuraiPainting.position.set(-3.5, .7, 9.9)
+entranceSamuraiPainting.name = "entranceSamuraiPainting"
 draggableObjects.push( entranceSamuraiPainting );
 
 // Create the living room paintings
@@ -926,6 +940,7 @@ scene.add(livingRoomSamuraiPainting);
 livingRoomSamuraiPainting.position.set(7, 1.2, 4.1)
 livingRoomSamuraiPainting.rotateY(Math.PI / 2)
 // livingRoomSamuraiPainting.rotateZ(Math.PI / 2)
+livingRoomSamuraiPainting.name = "livingRoomSamuraiPainting"
 draggableObjects.push( livingRoomSamuraiPainting );
 
 // // Create the bed
@@ -956,48 +971,53 @@ let mixer = null
 
 gltfLoader.load(
     '/models/Fox/glTF/Fox.gltf',
-    (fox) => {
-        console.log('success')
-        console.log(fox)
-
+    (fox) => {        
         mixer = new THREE.AnimationMixer(fox.scene)
         // const action = mixer.clipAction(fox.animations[0])
         // const action = mixer.clipAction(fox.animations[1])
         const action = mixer.clipAction(fox.animations[0])
-
+        
         action.play()
-
+        
         fox.scene.scale.set(0.01, 0.01, 0.01)
+        // fox.scene.scale.set(0.1, 0.1, 0.1)
         fox.scene.position.set(5.9, -2.5, 2)
-
+        
+        
         scene.add(fox.scene)
+        
+        fox.scene.bindMode = ""
+        fox.scene.castShadow = true
+        fox.scene.name = "fox"
+        // draggableObjects.push( fox );
+        draggableObjects.push( fox.scene );
 
     },
     (progress) => {
-        console.log('progress')
-        console.log(progress)
+        console.log('fox - progress: ', progress)
     },
     (error) => {
-        console.log('error')
-        console.log(error)
+        console.log('fox - error: ', error)
     }
 )
 
 gltfLoader.load(
   '/models/furnitures/furnitures.gltf',
   (furnitures) => {
-      console.log('furnitures: ','success')
       console.log('furnitures: ', furnitures)
       console.log('furnitures.children: ', furnitures.scene.children[0].children)
         
       const bed = furnitures.scene.children[0].children[2]
       
-      console.log('bed: ', bed.material)
       bed.material.color.set('#007FFF')
       bed.scale.set(200, 115, 115)
       bed.position.set(4.5, -2.5, -11.75)
       bed.rotation.set(0, Math.PI * 2, 0)
 
+      bed.name = "bed"
+      
+
+      draggableObjects.push( bed );
 
 
       scene.add(bed)
@@ -1005,18 +1025,17 @@ gltfLoader.load(
   },
   (progress) => {
       console.log('furnitures: ','progress')
-      console.log('furnitures: ',progress)
+      console.log('furnitures: ', progress)
   },
   (error) => {
-      console.log('furnitures: ','error')
-      console.log('furnitures: ',error)
+      console.log('furnitures: ', 'error')
+      console.log('furnitures: ', error)
   }
 )
 gltfLoader.load(
   '/models/bathroom_modern/bathroom_modern.gltf',
   (bathroom_modern) => {
-      console.log('bathroom_modern: ','success')
-      console.log('bathroom_modern: ', bathroom_modern)
+
 
       bathroom_modern.scene.scale.set(.8, .6, .3)
       bathroom_modern.scene.position.set(-5.6, -2, -6.5)
@@ -1027,27 +1046,35 @@ gltfLoader.load(
   },
   (progress) => {
       console.log('bathroom_modern: ','progress')
-      console.log('bathroom_modern: ',progress)
+      console.log('bathroom_modern: ', progress)
   },
   (error) => {
       console.log('bathroom_modern: ','error')
-      console.log('bathroom_modern: ',error)
+      console.log('bathroom_modern: ', error)
   }
 )
 gltfLoader.load(
   '/models/blue_couch/blue_couch.gltf',
   (blue_couch) => {
-      console.log('blue_couch: ','success')
-      console.log('blue_couch: ', blue_couch)
+
+
+      // const couch = blue_couch.scene
+
+      // couch.scale.set(30, 30, 30)
+      // couch.position.set(0.5, -2.5, 6.2)
+      // couch.rotation.set(0, Math.PI/2, 0)
+
+
 
       blue_couch.scene.scale.set(30, 30, 30)
       blue_couch.scene.position.set(0.5, -2.5, 6.2)
       blue_couch.scene.rotation.set(0, Math.PI/2, 0)
 
-      // blue_couch.scene.material.color.set('#9ACEEB')
-      // blue_couch.material.color.set('#9ACEEB')
+      blue_couch.scene.name = "couch"
 
-
+      draggableObjects.push( blue_couch.scene );
+      
+      
       scene.add(blue_couch.scene)
 
   },
@@ -1072,85 +1099,249 @@ const orbitControls = new OrbitControls(camera, canvas);
 
 
 /* UNCOMMENT BELOW TO ENABLE DRAG CONTROLS */
-const dragControls = new DragControls( [...draggableObjects], camera, canvas );
 
-let draggedObject = undefined
-let originalColorOfDraggedObject
+// Initialize DragControls
+const dragControls = new DragControls(draggableObjects, camera, renderer.domElement);
 
-let placementY = 0
-
-dragControls.addEventListener('dragstart', function ( event ) {
-  originalColorOfDraggedObject = event.object.material.color
-
-  placementY = event.object.position.y
-
-  draggedObject = event.object
-
-
-  event.object.castShadow = true;
-
-  // make sure objects stay on the ground
-  event.object.position.set(event.object.position.x, 1,event.object.position.z)
-} );
-
-
-dragControls.addEventListener('drag', function ( event ) {
+// Add event listener for 'dragstart' to update last valid position
+dragControls.addEventListener('dragstart', function(event) {
   
-  event.object.castShadow = true;
-  event.object.material.emissive.set( 0xaaaaaa );
+  const object = event.object;
+    
+  object.lastValidPosition = object.position.clone();
 
+});
   
-  // make sure objects stay on the ground
-	event.object.position.set(event.object.position.x, placementY ,event.object.position.z)
-
-// console.log(scene)
-console.log(event.object)
-
-  if (event.object.position.x > 19 ) { 
-    // bedroom window
-    event.object.position.x = 18.9
-  }
-  if (event.object.position.x < -1 ) {
-    // living room window
-    event.object.position.x = -0.9
-  }
-  
-  // if (event.object.position.y > 1) {
-  //   event.object.position.y = 1
-  // }
-  // if (event.object.position.y < -1) {
-  //   event.object.position.y = -1
-  // }
-
-  if (event.object.position.z > 6.5) {
-    event.object.position.z = 6.5
-  }
-  if (event.object.position.z < -6.5) {
-    event.object.position.z = -6.5
-  }
-
+// Add event listener for 'drag' to check collisions and possibly revert position
+dragControls.addEventListener('drag', function(event) {
+    
   orbitControls.enabled = false
+
+  const object = event.object;
+    
+  if (checkForCollisions(object)) {
+    // Collision detected, revert to the last valid position
+    object.position.copy(object.lastValidPosition);
+  } else {
+    // No collision detected, update last valid position
+    object.lastValidPosition.copy(object.position);
+  }
+
+  if (object.name == "bed") {
+    object.material.emissive.set('white'); 
+  }
+  else if (object.parent.parent.name == "couch") {
+    object.parent.children.forEach(child => {
+      child.material.emissive.set('white'); 
+      child.position.set(object.position.x, object.position.y, object.position.z); // Reset children positions to the center of the parent
+      child.rotation.set(object.rotation.x, object.rotation.y, object.rotation.z); // Reset rotations if needed
+    });
+  } 
+  else if (object.parent.name == "tvStand") {
+    object.parent.children.forEach(child => {
+      child.material.emissive.set('white'); 
+      child.position.set(object.position.x, object.position.y, object.position.z); // Reset children positions to the center of the parent
+      child.rotation.set(object.rotation.x, object.rotation.y, object.rotation.z); // Reset rotations if needed
+    });
+  }
+  else if (object.parent.name == "indoorDogPen") {
+    object.parent.children.forEach(child => {
+      child.material.emissive.set('white'); 
+      child.position.set(object.position.x, object.position.y, object.position.z); // Reset children positions to the center of the parent
+      child.rotation.set(object.rotation.x, object.rotation.y, object.rotation.z); // Reset rotations if needed
+    });
+  }
+  else if (object.parent.name == "blackBlueDesk") {
+    object.parent.children.forEach(child => {
+      child.material.emissive.set('white'); 
+      child.position.set(object.position.x, object.position.y, object.position.z); // Reset children positions to the center of the parent
+      child.rotation.set(object.rotation.x, object.rotation.y, object.rotation.z); // Reset rotations if needed
+    });
+  }
+  else if (object.parent.name == "woodBlock") {
+    object.parent.children.forEach(child => {
+      child.material.emissive.set('white'); 
+      child.position.set(object.position.x, object.position.y, object.position.z); // Reset children positions to the center of the parent
+      child.rotation.set(object.rotation.x, object.rotation.y, object.rotation.z); // Reset rotations if needed
+    });
+  }
+  else if (object.parent.name == "metalTable") {
+    object.parent.children.forEach(child => {
+      child.material.emissive.set('white'); 
+      child.position.set(object.position.x, object.position.y, object.position.z); // Reset children positions to the center of the parent
+      child.rotation.set(object.rotation.x, object.rotation.y, object.rotation.z); // Reset rotations if needed
+    });
+  }
+  else if (object.parent.name == "leatherChair") {
+    object.parent.children.forEach(child => {
+      child.material.emissive.set('white'); 
+      child.position.set(object.position.x, object.position.y, object.position.z); // Reset children positions to the center of the parent
+      child.rotation.set(object.rotation.x, object.rotation.y, object.rotation.z); // Reset rotations if needed
+    });
+  }
+  else if (object.parent.name == "officeStand") {
+    object.parent.children.forEach(child => {
+      child.material.emissive.set('white'); 
+      child.position.set(object.position.x, object.position.y, object.position.z); // Reset children positions to the center of the parent
+      child.rotation.set(object.rotation.x, object.rotation.y, object.rotation.z); // Reset rotations if needed
+    });
+  }
+  else if (object.parent.name == "bookshelf") {
+    object.parent.children.forEach(child => {
+      child.material.emissive.set('white'); 
+      child.position.set(object.position.x, object.position.y, object.position.z); // Reset children positions to the center of the parent
+      child.rotation.set(object.rotation.x, object.rotation.y, object.rotation.z); // Reset rotations if needed
+    });
+  }
+  else if (object.parent.name == "officeSamuraiPainting") {
+    object.parent.children.forEach(child => {
+      child.material.emissive.set('white'); 
+      child.position.set(object.position.x, object.position.y, object.position.z); // Reset children positions to the center of the parent
+      child.rotation.set(object.rotation.x, object.rotation.y, object.rotation.z); // Reset rotations if needed
+    });
+  }
+  else if (object.parent.name == "officeRoshaschPainting") {
+    object.parent.children.forEach(child => {
+      child.material.emissive.set('white'); 
+      child.position.set(object.position.x, object.position.y, object.position.z); // Reset children positions to the center of the parent
+      child.rotation.set(object.rotation.x, object.rotation.y, object.rotation.z); // Reset rotations if needed
+    });
+  }
+  else if (object.parent.name == "officeJesterPainting") {
+    object.parent.children.forEach(child => {
+      child.material.emissive.set('white'); 
+      child.position.set(object.position.x, object.position.y, object.position.z); // Reset children positions to the center of the parent
+      child.rotation.set(object.rotation.x, object.rotation.y, object.rotation.z); // Reset rotations if needed
+    });
+  }
+  else if (object.parent.name == "entranceSamuraiPainting") {
+    object.parent.children.forEach(child => {
+      child.material.emissive.set('white'); 
+      child.position.set(object.position.x, object.position.y, object.position.z); // Reset children positions to the center of the parent
+      child.rotation.set(object.rotation.x, object.rotation.y, object.rotation.z); // Reset rotations if needed
+    });
+  }
+  else if (object.parent.name == "livingRoomSamuraiPainting") {
+    object.parent.children.forEach(child => {
+      child.material.emissive.set('white'); 
+      child.position.set(object.position.x, object.position.y, object.position.z); // Reset children positions to the center of the parent
+      child.rotation.set(object.rotation.x, object.rotation.y, object.rotation.z); // Reset rotations if needed
+    });
+  } else {
+
+  }
+
+});
+
+// Add event listener for 'dragstart' to update last valid position
+dragControls.addEventListener('dragend', function(event) {
+
+  const object = event.object;
   
-  
-} );
-
-
-
-dragControls.addEventListener('dragend', function ( event ) {
-
-
-
-  event.object.material.emissive.set( originalColorOfDraggedObject );
-  event.object.castShadow = false;
-
-  draggedObject = undefined
-
   orbitControls.enabled = true
 
+  if (object.name == "bed") {
+    object.material.emissive.set({b:0, g: 0, r: 0, isColor: true}); 
+  }
+  else if (object.parent.parent.name == "couch") {
+    object.parent.children.forEach(child => {
+      child.material.emissive.set({b:0, g: 0, r: 0, isColor: true});  
+    });
+  } 
+  else if (object.parent.name == "tvStand") {
+    object.parent.children.forEach(child => {
+      child.material.emissive.set({b:0, g: 0, r: 0, isColor: true});  
+    });
+  }
+  else if (object.parent.name == "indoorDogPen") {
+    object.parent.children.forEach(child => {
+      child.material.emissive.set({b:0, g: 0, r: 0, isColor: true});  
+    });
+  }
+  else if (object.parent.name == "blackBlueDesk") {
+    object.parent.children.forEach(child => {
+      child.material.emissive.set({b:0, g: 0, r: 0, isColor: true});  
+    });
+  }
+  else if (object.parent.name == "woodBlock") {
+    object.parent.children.forEach(child => {
+      child.material.emissive.set({b:0, g: 0, r: 0, isColor: true});  
+    });
+  }
+  else if (object.parent.name == "metalTable") {
+    object.parent.children.forEach(child => {
+      child.material.emissive.set({b:0, g: 0, r: 0, isColor: true});  
+    });
+  }
+  else if (object.parent.name == "leatherChair") {
+    object.parent.children.forEach(child => {
+      child.material.emissive.set({b:0, g: 0, r: 0, isColor: true});  
+    });
+  }
+  else if (object.parent.name == "officeStand") {
+    object.parent.children.forEach(child => {
+      child.material.emissive.set({b:0, g: 0, r: 0, isColor: true});  
+    });
+  }
+  else if (object.parent.name == "bookshelf") {
+    object.parent.children.forEach(child => {
+      child.material.emissive.set({b:0, g: 0, r: 0, isColor: true});  
+    });
+  }
+  else if (object.parent.name == "officeSamuraiPainting") {
+    object.parent.children.forEach(child => {
+      child.material.emissive.set({b:0, g: 0, r: 0, isColor: true});  
+    });
+  }
+  else if (object.parent.name == "officeRoshaschPainting") {
+    object.parent.children.forEach(child => {
+      child.material.emissive.set({b:0, g: 0, r: 0, isColor: true});  
+    });
+  }
+  else if (object.parent.name == "officeJesterPainting") {
+    object.parent.children.forEach(child => {
+      child.material.emissive.set({b:0, g: 0, r: 0, isColor: true});  
+    });
+  }
+  else if (object.parent.name == "entranceSamuraiPainting") {
+    object.parent.children.forEach(child => {
+      child.material.emissive.set({b:0, g: 0, r: 0, isColor: true});  
+    });
+  }
+  else if (object.parent.name == "livingRoomSamuraiPainting") {
+    object.parent.children.forEach(child => {
+      child.material.emissive.set({b:0, g: 0, r: 0, isColor: true});  
+    });
+  }
 
-} );
+});
 
 
+
+
+// Function to check for collisions
+function checkForCollisions(currentObject) {
+  // currentObject.updateMatrixWorld(true); // Update the world matrix
+  
+  // console.log('checkForCollisions - currentObject: ', currentObject)
+  // // console.log('checkForCollisions - updateMatrixWorld: ', currentObject.updateMatrixWorld)
+  // const currentBoundingBox = new THREE.Box3().setFromObject(currentObject);
+  // console.log('checkForCollisions - currentBoundingBox: ', currentBoundingBox)
+  
+  // for (let otherObject of draggableObjects) {
+  //   otherObject.updateMatrixWorld(true); // Update the world matrix
+  //   // console.log('checkForCollisions - otherObject: ', otherObject)
+  //   if (otherObject !== currentObject) {
+  //       // console.log('checkForCollisions - otherObject !== currentObject: ', otherObject !== currentObject)
+  //         const otherBoundingBox = new THREE.Box3().setFromObject(otherObject);
+  //         if (currentBoundingBox.intersectsBox(otherBoundingBox)) {
+  //             // console.log("Collision detected with another object!");
+  //             return true; // Collision occurred
+  //         }
+  //     }
+  // }
+  return false; // No collision
+}
 
 /**
  * Animate
