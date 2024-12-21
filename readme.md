@@ -1,5 +1,7 @@
 # Three.js Journey
 
+[Watch the demo!](https://youtu.be/wUECymLMS18)
+
 Prod url: https://apartment-configurator-9aahic0u3-dev94s-projects-9a098fa3.vercel.app/
 
 ## Setup
