@@ -23,7 +23,6 @@ renderer.shadowMap.type = THREE.BasicShadowMap; // default THREE.PCFShadowMap
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-// const draggableObjects = [];
 const draggableObjects = new THREE.Group();
 
 /* 
